@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+**/.git
+**/dist
+**/build
+.replit
+replit.nix
+.local
+attached_assets
+*.log
+.env
+.env.*
+railway.json
+nixpacks.toml

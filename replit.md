@@ -51,6 +51,8 @@
 4. Set env: OPENROUTER_API_KEY
 5. Deploy — Railway auto-detects nixpacks.toml
 
+**Pricing note:** Railway offers a trial with $5 in credits for 30 days. After the trial, the free tier includes a small monthly free credit allowance (currently around $1/month). Usage beyond that requires adding a payment method.
+
 ## Architecture decisions
 
 - OpenRouter as AI provider (supports 100+ models, no vendor lock-in)
@@ -61,7 +63,7 @@
 
 ## User preferences
 
-- نشر على Railway (مجاني مع 5$ رصيد شهري)
+- نشر على Railway (تجربة $5 لـ 30 يومًا، ثم Free tier بحدود)
 - دعم كامل للعربية وRTL
 - تصميم داكن أولاً
 

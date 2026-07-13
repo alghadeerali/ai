@@ -56,11 +56,24 @@ export function Sidebar() {
   };
 
   const NavContent = () => (
-    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="p-4 flex items-center justify-between">
+    <div
+      className="flex h-full flex-col bg-sidebar text-sidebar-foreground"
+      onClick={(e) => {
+        // Close the mobile drawer whenever a nav link is tapped
+        if ((e.target as HTMLElement).closest("a")) setIsMobileOpen(false);
+      }}
+    >
+      <div className="p-4 pb-2">
         <h2 className="text-xl font-bold tracking-tight text-sidebar-primary">AI Workspace</h2>
-        <Button variant="ghost" size="icon" onClick={() => handleNewConversation()}>
-          <Plus className="h-5 w-5" />
+      </div>
+
+      <div className="px-3 pb-2">
+        <Button
+          className="w-full justify-start gap-2"
+          onClick={() => handleNewConversation()}
+        >
+          <Plus className="h-4 w-4" />
+          محادثة جديدة
         </Button>
       </div>
 

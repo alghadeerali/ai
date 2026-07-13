@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "AI Workspace"
+version = "1.0.0"
+id = "artifacts/ai-workspace"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19531
+
+[services.development]
+run = "pnpm --filter @workspace/ai-workspace run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-workspace", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ai-workspace/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19531"
+BASE_PATH = "/"

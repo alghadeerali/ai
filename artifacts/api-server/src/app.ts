@@ -36,19 +36,17 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
-// Serve React frontend in production
-if (process.env.NODE_ENV === "production") {
-  const staticPath = path.resolve(__dirname, "../../ai-workspace/dist/public");
-  if (fs.existsSync(staticPath)) {
-    app.use(express.static(staticPath));
-    // SPA fallback — serve index.html for all non-API routes
-    app.get("*", (_req, res) => {
-      res.sendFile(path.join(staticPath, "index.html"));
-    });
-    logger.info({ staticPath }, "Serving static frontend");
-  } else {
-    logger.warn({ staticPath }, "Static frontend not found — skipping");
-  }
+// Serve React frontend if built static files exist
+const staticPath = path.resolve(__dirname, "../../ai-workspace/dist/public");
+if (fs.existsSync(staticPath)) {
+  app.use(express.static(staticPath));
+  // SPA fallback — serve index.html for all non-API routes
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(staticPath, "index.html"));
+  });
+  logger.info({ staticPath }, "Serving static frontend");
+} else {
+  logger.warn({ staticPath }, "Static frontend not found — API only mode");
 }
 
 export default app;

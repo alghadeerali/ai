@@ -12,6 +12,7 @@ export const messagesTable = pgTable("messages", {
   promptTokens: integer("prompt_tokens"),
   completionTokens: integer("completion_tokens"),
   costUsd: real("cost_usd"),
+  reasoning: text("reasoning"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

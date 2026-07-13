@@ -1,14 +1,36 @@
 import { useSettings } from "@/providers/SettingsProvider";
 import { useTheme } from "next-themes";
-import { Settings, Moon, Sun, Monitor, AlignLeft, AlignRight, Key } from "lucide-react";
+import { useListModels } from "@workspace/api-client-react";
+import { Settings, Moon, Sun, Monitor, AlignLeft, AlignRight, Key, MessageSquare, Cpu, Star } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const { direction, setDirection, openRouterKeyConfigured } = useSettings();
+  const {
+    direction,
+    setDirection,
+    openRouterKeyConfigured,
+    enterToSend,
+    setEnterToSend,
+    favoriteModels,
+    toggleFavoriteModel,
+    defaultModel,
+    setDefaultModel,
+  } = useSettings();
+  const { data: models } = useListModels();
 
   return (
     <div className="flex-1 p-8 bg-background overflow-y-auto">
@@ -32,7 +54,7 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Theme</Label>
                 <RadioGroup 
-                  defaultValue={theme || "dark"} 
+                  value={theme || "light"} 
                   onValueChange={setTheme}
                   className="grid grid-cols-3 gap-4"
                 >
@@ -100,6 +122,85 @@ export default function SettingsPage() {
                     RTL
                   </Label>
                 </RadioGroup>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-primary" /> المحادثة
+              </CardTitle>
+              <CardDescription>تحكّم في سلوك الإرسال والنماذج.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <Label className="text-sm font-medium">زر Enter يرسل الرسالة</Label>
+                  <p className="text-xs text-muted-foreground">
+                    عند التفعيل: Enter يرسل و Shift+Enter سطر جديد. عند الإيقاف: Enter سطر جديد و Ctrl/Cmd+Enter يرسل.
+                  </p>
+                </div>
+                <Switch checked={enterToSend} onCheckedChange={setEnterToSend} />
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="space-y-3">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Cpu className="h-4 w-4" /> النموذج الافتراضي للمحادثات الجديدة
+                </Label>
+                <Select value={defaultModel} onValueChange={setDefaultModel}>
+                  <SelectTrigger className="w-full max-w-sm">
+                    <SelectValue placeholder="اختر نموذجاً" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {models?.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="space-y-3">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Star className="h-4 w-4" /> النماذج المفضّلة
+                </Label>
+                <CardDescription>
+                  اختر النماذج التي تظهر في قائمة المحادثة. إذا لم تختر أياً منها، ستظهر جميع النماذج.
+                </CardDescription>
+                <ScrollArea className="h-64 rounded-md border border-border p-2">
+                  <div className="space-y-1">
+                    {models?.map((m) => (
+                      <label
+                        key={m.id}
+                        htmlFor={`fav-${m.id}`}
+                        className="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/50 cursor-pointer"
+                      >
+                        <Checkbox
+                          id={`fav-${m.id}`}
+                          checked={favoriteModels.includes(m.id)}
+                          onCheckedChange={() => toggleFavoriteModel(m.id)}
+                        />
+                        <span className="text-sm flex-1 truncate">{m.name}</span>
+                        {m.isFree && (
+                          <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                            Free
+                          </span>
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                </ScrollArea>
+                {favoriteModels.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    مختار {favoriteModels.length} نموذج.
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

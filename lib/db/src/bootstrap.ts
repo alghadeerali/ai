@@ -6,13 +6,30 @@ import { db } from "./index";
 import { projectsTable } from "./schema/projects";
 import { personasTable } from "./schema/personas";
 
-/** Returns true if the given table already exists in the public schema. */
-async function tableExists(tableName: string): Promise<boolean> {
+/** Returns true if the given fully-qualified relation exists. */
+async function relationExists(qualifiedName: string): Promise<boolean> {
   const result = await db.execute(
-    sql`SELECT to_regclass(${"public." + tableName}) AS exists`,
+    sql`SELECT to_regclass(${qualifiedName}) AS exists`,
   );
-  const rows = (result as { rows?: Array<{ exists: string | null }> }).rows ?? [];
+  const rows =
+    (result as unknown as { rows?: Array<{ exists: string | null }> }).rows ?? [];
   return rows.length > 0 && rows[0].exists !== null;
+}
+
+/**
+ * Number of migrations recorded in drizzle's journal. Returns 0 if the journal
+ * table doesn't exist OR exists but is empty (a failed prior migrate() can
+ * leave an empty journal table behind, since drizzle creates it outside the
+ * migration transaction).
+ */
+async function recordedMigrationCount(): Promise<number> {
+  if (!(await relationExists("drizzle.__drizzle_migrations"))) return 0;
+  const result = await db.execute(
+    sql`SELECT count(*)::int AS c FROM drizzle.__drizzle_migrations`,
+  );
+  const rows =
+    (result as unknown as { rows?: Array<{ c: number }> }).rows ?? [];
+  return rows[0]?.c ?? 0;
 }
 
 /**
@@ -92,21 +109,31 @@ const DEFAULT_PERSONAS = [
 export async function bootstrapDatabase(
   log: (msg: string) => void = console.log,
 ): Promise<void> {
-  // Only run migrations on a fresh database. If the core tables already exist
-  // (e.g. created via `drizzle push` in dev, or on a prior boot), skip — the
-  // migrator would otherwise fail trying to re-create existing tables.
-  const alreadySetup = await tableExists("projects");
-  if (alreadySetup) {
-    log("Schema already present — skipping migrations");
+  // Decide how to bring the schema up to date, handling three cases:
+  //  1. Fresh DB (no tables)            → run all migrations.
+  //  2. Prod DB with a migration journal → apply any pending migrations.
+  //  3. Legacy/dev DB created via `drizzle push` (tables but no journal)
+  //     → skip migrate() (it would try to re-create/alter existing objects);
+  //     the schema is managed by `drizzle push` in that environment.
+  const hasSchema = await relationExists("public.projects");
+  const recordedCount = await recordedMigrationCount();
+  const migrationsFolder = findMigrationsFolder();
+
+  if (hasSchema && recordedCount === 0) {
+    log("Schema present but no migrations recorded — externally (push) managed; skipping migrate");
+    // Self-heal: since migrate() is skipped here, additive columns from newer
+    // schema revisions won't be applied automatically. Guard the ones that
+    // runtime inserts depend on with idempotent ALTERs so a push-managed (or
+    // journal-less) database can never fail message inserts.
+    await db.execute(
+      sql`ALTER TABLE IF EXISTS messages ADD COLUMN IF NOT EXISTS reasoning text`,
+    );
+  } else if (!migrationsFolder) {
+    log("No migrations folder found — skipping migrations");
   } else {
-    const migrationsFolder = findMigrationsFolder();
-    if (migrationsFolder) {
-      log(`Running migrations from ${migrationsFolder}`);
-      await migrate(db, { migrationsFolder });
-      log("Migrations complete");
-    } else {
-      log("No migrations folder found — skipping migrations");
-    }
+    log(`Running migrations from ${migrationsFolder}`);
+    await migrate(db, { migrationsFolder });
+    log("Migrations complete");
   }
 
   const existingProjects = await db.select().from(projectsTable).limit(1);

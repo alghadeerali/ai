@@ -1,0 +1,1 @@
+- [Render free hosting](render-free-hosting.md) — pnpm version must match lockfile; single-stage Docker; Express 5 has no bare "*" route; auto-migrate+seed on boot (free plan has no Shell).

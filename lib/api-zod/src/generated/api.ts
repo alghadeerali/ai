@@ -223,6 +223,7 @@ export const GetConversationResponse = zod.object({
   "promptTokens": zod.number().nullish(),
   "completionTokens": zod.number().nullish(),
   "costUsd": zod.number().nullish(),
+  "reasoning": zod.string().nullish(),
   "createdAt": zod.string()
 })),
   "persona": zod.union([zod.object({
@@ -357,6 +358,7 @@ export const ListMessagesResponseItem = zod.object({
   "promptTokens": zod.number().nullish(),
   "completionTokens": zod.number().nullish(),
   "costUsd": zod.number().nullish(),
+  "reasoning": zod.string().nullish(),
   "createdAt": zod.string()
 })
 export const ListMessagesResponse = zod.array(ListMessagesResponseItem)
@@ -374,7 +376,8 @@ export const SendMessageParams = zod.object({
 
 export const SendMessageBody = zod.object({
   "content": zod.string().min(1),
-  "model": zod.string().nullish()
+  "model": zod.string().nullish(),
+  "thinking": zod.boolean().optional()
 })
 
 export const SendMessageResponse = zod.object({
@@ -387,6 +390,7 @@ export const SendMessageResponse = zod.object({
   "promptTokens": zod.number().nullish(),
   "completionTokens": zod.number().nullish(),
   "costUsd": zod.number().nullish(),
+  "reasoning": zod.string().nullish(),
   "createdAt": zod.string()
 }),
   "assistantMessage": zod.object({
@@ -398,6 +402,7 @@ export const SendMessageResponse = zod.object({
   "promptTokens": zod.number().nullish(),
   "completionTokens": zod.number().nullish(),
   "costUsd": zod.number().nullish(),
+  "reasoning": zod.string().nullish(),
   "createdAt": zod.string()
 })
 })

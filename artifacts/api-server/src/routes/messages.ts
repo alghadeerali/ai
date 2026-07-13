@@ -24,9 +24,10 @@ router.get("/", async (req, res) => {
 // Send a message and get AI response
 router.post("/", async (req, res) => {
   const conversationId = Number(req.params.id);
-  const { content, model: overrideModel } = req.body as {
+  const { content, model: overrideModel, thinking } = req.body as {
     content: string;
     model?: string | null;
+    thinking?: boolean;
   };
 
   // Get conversation
@@ -90,6 +91,10 @@ router.post("/", async (req, res) => {
         model,
         messages: chatMessages,
         stream: false,
+        // Ask OpenRouter to include the real credit cost in the usage object
+        usage: { include: true },
+        // Enable reasoning tokens for reasoning-capable models when requested
+        ...(thinking ? { reasoning: { enabled: true } } : {}),
       }),
     });
 
@@ -99,24 +104,29 @@ router.post("/", async (req, res) => {
     }
 
     const data = (await response.json()) as {
-      choices: { message: { content: string } }[];
+      choices: { message: { content: string; reasoning?: string | null } }[];
       usage?: {
         prompt_tokens: number;
         completion_tokens: number;
         total_tokens: number;
+        cost?: number;
       };
       model?: string;
     };
 
     const assistantContent = data.choices[0]?.message?.content ?? "";
+    const reasoning = data.choices[0]?.message?.reasoning ?? null;
     const usage = data.usage;
     const actualModel = data.model || model;
 
-    // Calculate cost (rough estimate based on OpenRouter pricing)
-    // Average ~$0.0015 per 1K tokens as fallback
     const promptTokens = usage?.prompt_tokens ?? 0;
     const completionTokens = usage?.completion_tokens ?? 0;
-    const costUsd = ((promptTokens + completionTokens) / 1000) * 0.0015;
+    // Prefer the real cost reported by OpenRouter (usage.cost); fall back to a
+    // rough per-token estimate only if it's unavailable.
+    const costUsd =
+      typeof usage?.cost === "number" && Number.isFinite(usage.cost)
+        ? usage.cost
+        : ((promptTokens + completionTokens) / 1000) * 0.0015;
 
     // Save assistant message
     const [assistantMessage] = await db
@@ -129,6 +139,7 @@ router.post("/", async (req, res) => {
         promptTokens,
         completionTokens,
         costUsd,
+        reasoning,
       })
       .returning();
 

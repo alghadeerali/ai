@@ -20,5 +20,7 @@ export interface Message {
   completionTokens?: number | null;
   /** @nullable */
   costUsd?: number | null;
+  /** @nullable */
+  reasoning?: string | null;
   createdAt: string;
 }

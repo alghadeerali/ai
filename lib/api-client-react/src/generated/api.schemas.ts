@@ -86,6 +86,8 @@ export interface Message {
   completionTokens?: number | null;
   /** @nullable */
   costUsd?: number | null;
+  /** @nullable */
+  reasoning?: string | null;
   createdAt: string;
 }
 
@@ -148,6 +150,7 @@ export interface MessageInput {
   content: string;
   /** @nullable */
   model?: string | null;
+  thinking?: boolean;
 }
 
 export interface SendMessageResult {

@@ -11,4 +11,5 @@ export interface MessageInput {
   content: string;
   /** @nullable */
   model?: string | null;
+  thinking?: boolean;
 }

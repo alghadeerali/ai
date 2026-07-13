@@ -739,6 +739,8 @@ components:
           type: ["integer", "null"]
         costUsd:
           type: ["number", "null"]
+        reasoning:
+          type: ["string", "null"]
         createdAt:
           type: string
       required: [id, conversationId, role, content, createdAt]
@@ -751,6 +753,8 @@ components:
           minLength: 1
         model:
           type: ["string", "null"]
+        thinking:
+          type: boolean
       required: [content]
 
     SendMessageResult:

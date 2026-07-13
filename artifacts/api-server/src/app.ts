@@ -40,8 +40,10 @@ app.use("/api", router);
 const staticPath = path.resolve(__dirname, "../../ai-workspace/dist/public");
 if (fs.existsSync(staticPath)) {
   app.use(express.static(staticPath));
-  // SPA fallback — serve index.html for all non-API routes
-  app.get("*", (_req, res) => {
+  // SPA fallback — serve index.html for all non-API GET requests
+  // (Express 5 no longer accepts a bare "*" route, so use middleware.)
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || req.path.startsWith("/api")) return next();
     res.sendFile(path.join(staticPath, "index.html"));
   });
   logger.info({ staticPath }, "Serving static frontend");

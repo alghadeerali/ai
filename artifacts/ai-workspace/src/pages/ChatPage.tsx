@@ -300,19 +300,7 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
                 <div className={`flex min-w-0 flex-col gap-1 ${isUser ? 'items-end' : 'items-start'} max-w-[88%]`}>
                   {!isUser && msg.reasoning && <ReasoningBlock reasoning={msg.reasoning} />}
                   <div className={`prose prose-sm max-w-none break-words rounded-2xl px-4 py-3 ${isUser ? 'bg-primary text-primary-foreground' : 'bg-card border border-border text-foreground'}`}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
-                      code({ inline, className, children, ...props }: any) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        const [copied, setCopied] = useState(false);
-                        const normalized = String(children).endsWith('
-') ? String(children).slice(0, -1) : String(children);
-                        const onCopy = () => { navigator.clipboard.writeText(normalized); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-                        if (!inline && match) return (<div className="my-3 overflow-hidden rounded-xl border border-border"><div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground"><span>{match[1]}</span><Button variant="ghost" size="icon" className="h-6 w-6" onClick={onCopy}>{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}</Button></div><SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" customStyle={{ margin: 0, borderRadius: 0, background: 'transparent' }} {...props}>{normalized}</SyntaxHighlighter></div>);
-                        return <code className="rounded-md bg-muted px-1.5 py-0.5 text-sm font-mono" {...props}>{children}</code>;
-                      }
-                    }}>
-                      {msg.content}
-                    </ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                   </div>
                 </div>
               </div>

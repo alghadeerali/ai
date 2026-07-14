@@ -15,6 +15,8 @@ interface SettingsContextType {
   /** Model used for brand-new conversations. */
   defaultModel: string;
   setDefaultModel: (id: string) => void;
+  tempChatEnabled: boolean;
+  setTempChatEnabled: (v: boolean) => void;
   openRouterKeyConfigured: boolean;
 }
 
@@ -42,6 +44,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [defaultModel, setDefaultModel] = useState<string>(
     () => localStorage.getItem("app-default-model") || "openai/gpt-4o",
   );
+  const [tempChatEnabled, setTempChatEnabled] = useState<boolean>(
+    () => readJSON<boolean>("app-temp-chat", false),
+  );
 
   useEffect(() => {
     localStorage.setItem("app-direction", direction);
@@ -64,6 +69,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("app-default-model", defaultModel);
   }, [defaultModel]);
 
+  useEffect(() => {
+    localStorage.setItem("app-temp-chat", JSON.stringify(tempChatEnabled));
+  }, [tempChatEnabled]);
+
   const toggleFavoriteModel = (id: string) => {
     setFavoriteModels((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
@@ -82,6 +91,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         toggleFavoriteModel,
         defaultModel,
         setDefaultModel,
+        tempChatEnabled,
+        setTempChatEnabled,
         openRouterKeyConfigured: true,
       }}
     >

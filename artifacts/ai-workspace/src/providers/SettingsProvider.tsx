@@ -47,6 +47,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [tempChatEnabled, setTempChatEnabled] = useState<boolean>(
     () => readJSON<boolean>("app-temp-chat", false),
   );
+  const [tempChatEnabled, setTempChatEnabled] = useState<boolean>(
+    () => readJSON<boolean>("app-temp-chat", false),
+  );
 
   useEffect(() => {
     localStorage.setItem("app-direction", direction);
@@ -68,6 +71,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem("app-default-model", defaultModel);
   }, [defaultModel]);
+
+  useEffect(() => {
+    localStorage.setItem("app-temp-chat", JSON.stringify(tempChatEnabled));
+  }, [tempChatEnabled]);
 
   useEffect(() => {
     localStorage.setItem("app-temp-chat", JSON.stringify(tempChatEnabled));

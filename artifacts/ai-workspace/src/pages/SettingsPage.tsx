@@ -1,18 +1,23 @@
 import { useSettings } from "@/providers/SettingsProvider";
-import { Star, Check, Search, ImagePlus } from "lucide-react";
+import { Star, Check, Search, ImagePlus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default function SettingsPage() {
+export default function SettingsPage({ onClose }: { onClose?: () => void }) {
   const { allModels, imageModels, favoriteModels, toggleFavoriteModel, defaultModel, setDefaultModel, modelSearch, setModelSearch } = useSettings();
   const ranked = [
     ...allModels.filter(m => favoriteModels.includes(m.id)).map(m => ({...m, pinned: true})),
     ...allModels.filter(m => !favoriteModels.includes(m.id)),
-  ].slice(0, 15);
+  ];
 
   return <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
-    <h1 className="text-2xl font-bold">الإعدادات</h1>
-    <p className="mt-2 text-muted-foreground">إدارة الموديلات من مكان واحد، وتُستخدم في الجوال والديسكتوب.</p>
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-bold">الإعدادات</h1>
+        <p className="mt-2 text-muted-foreground">الموديلات محفوظة ومشتركة بين الجوال والديسكتوب.</p>
+      </div>
+      {onClose && <Button variant="ghost" size="icon" onClick={onClose}><X className="h-5 w-5" /></Button>}
+    </div>
 
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
       <section className="rounded-3xl border border-border bg-card p-4 sm:p-6">
@@ -35,10 +40,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-2 text-lg font-semibold"><ImagePlus className="h-5 w-5 text-primary" /> إنشاء صورة</div>
         <div className="mt-4 space-y-2">
           {imageModels.map((m) => <div key={m.id} className="flex items-center justify-between rounded-2xl border border-border bg-muted/30 px-4 py-3">
-            <div>
-              <div className="font-medium">{m.name}</div>
-              <div className="text-xs text-muted-foreground">الكلفة التقديرية: {m.cost}</div>
-            </div>
+            <div><div className="font-medium">{m.name}</div><div className="text-xs text-muted-foreground">الكلفة التقديرية: {m.cost}</div></div>
             <Button size="sm" variant={m.id === defaultModel ? 'default' : 'outline'} onClick={() => setDefaultModel(m.id)}>اختيار</Button>
           </div>)}
         </div>

@@ -20,13 +20,22 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const go = (href: string) => { setLocation(href); onClose?.(); };
   const newConversation = () => createConv.mutate({ data: { title: "محادثة جديدة", model: "openai/gpt-4o" } }, { onSuccess: (c) => go(`/c/${c.id}`) });
   const del = (id: number) => updateConv.mutate({ id, data: { deleted: true } as any }, { onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() }); toast.success("تم حذف المحادثة"); if (location === `/c/${id}`) go("/"); } });
+  const clearAllConversations = async () => {
+    const list = conversations ?? [];
+    for (const c of list) {
+      await updateConv.mutateAsync({ id: c.id, data: { deleted: true } as any });
+    }
+    await queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() });
+    toast.success("تم حذف جميع المحادثات");
+    if (location.startsWith('/c/')) go('/');
+  };
   const item = (href: string, label: string, icon: any) => <button type="button" onClick={() => go(href)} className={`flex h-11 w-full items-center gap-3 rounded-2xl px-3 text-sm font-medium ${location === href || (href !== '/' && location.startsWith(href)) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60'}`}>{icon}{label}</button>;
   return <div className="flex h-full min-h-0 flex-col bg-sidebar text-sidebar-foreground">
     <div className="flex items-center justify-between border-b border-sidebar-border p-4">
       <div className="min-w-0"><div className="truncate text-lg font-bold tracking-tight text-sidebar-primary">alghadeer ai</div><div className="text-[11px] text-sidebar-foreground/60">Projects • Chats</div></div>
       {onClose && <Button variant="ghost" size="icon" className="h-9 w-9 md:hidden" onClick={onClose} aria-label="إغلاق"><X className="h-5 w-5" /></Button>}
     </div>
-    <div className="p-3"><Button className="h-11 w-full justify-start gap-2 rounded-2xl" onClick={newConversation}><Plus className="h-4 w-4" /> محادثة جديدة</Button></div>
+    <div className="p-3 space-y-2"><Button className="h-11 w-full justify-start gap-2 rounded-2xl" onClick={newConversation}><Plus className="h-4 w-4" /> محادثة جديدة</Button><Button variant="outline" className="h-11 w-full justify-start gap-2 rounded-2xl" onClick={clearAllConversations}><Trash2 className="h-4 w-4" /> حذف جميع المحادثات</Button></div>
     <div className="px-3 pb-3"><Button variant="outline" className="h-11 w-full justify-start rounded-2xl bg-sidebar-accent/40 border-sidebar-border text-sidebar-foreground/80" onClick={() => go("/search")}><Search className="mr-2 h-4 w-4" /> بحث</Button></div>
     <ScrollArea className="flex-1 min-h-0 px-3">
       <div className="space-y-1 pb-3">

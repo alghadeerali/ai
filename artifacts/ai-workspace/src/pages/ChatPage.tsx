@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useSettings } from "@/providers/SettingsProvider";
 import { Sidebar, MobileSidebar, MobileSidebarTrigger } from "@/components/layout/Sidebar";
+import SettingsPage from "@/pages/SettingsPage";
 
 function ReasoningBlock({ reasoning }: { reasoning: string }) { const [open, setOpen] = useState(false); return <div className="w-full overflow-hidden rounded-2xl border border-border bg-muted/30"><button type="button" onClick={() => setOpen(v => !v)} className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-muted-foreground"><Brain className="h-3.5 w-3.5 text-primary" />التفكير <ChevronDown className={`ml-auto h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} /></button>{open && <div className="border-t border-border/50 px-3 py-2 text-[13px] leading-relaxed text-muted-foreground whitespace-pre-wrap">{reasoning}</div>}</div> }
 
@@ -21,12 +22,13 @@ export default function ChatPage() {
   const [, setLocation] = useLocation();
   const id = match && params?.id ? parseInt(params.id, 10) : null;
   const queryClient = useQueryClient();
-  const { direction, enterToSend, defaultModel, tempChatEnabled, setTempChatEnabled } = useSettings();
+  const { direction, enterToSend, defaultModel } = useSettings();
   const [input, setInput] = useState("");
   const [editedTitle, setEditedTitle] = useState("");
   const [selectedModel, setSelectedModel] = useState<string>(defaultModel);
   const [showActions, setShowActions] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -55,7 +57,7 @@ export default function ChatPage() {
       <div className="md:hidden sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background px-3">
         <MobileSidebarTrigger onOpen={() => setShowDrawer(true)} />
         <div className="min-w-0 flex-1 px-2 text-center"><div className="truncate text-base font-bold tracking-tight">{id ? (conversation?.title || 'محادثة جديدة') : 'محادثة جديدة'}</div><div className="truncate text-[11px] text-muted-foreground">{tempChatEnabled ? 'مؤقتة' : ''}</div></div>
-        <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setShowActions((v) => !v)}><Plus className="h-5 w-5" /></Button>
+        <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setShowSettings(true)} aria-label="الإعدادات"><Menu className="h-5 w-5" /></Button>
       </div>
       <MobileSidebar open={showDrawer} onOpenChange={setShowDrawer} />
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-0 py-0 sm:px-4 sm:py-6" dir={direction === 'rtl' ? 'rtl' : 'ltr'}>
@@ -67,21 +69,21 @@ export default function ChatPage() {
       <div className="border-t border-border bg-background px-0 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-3">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-3 sm:px-0">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <Button type="button" variant="outline" size="sm" className={`h-9 shrink-0 rounded-full px-3 text-xs ${tempChatEnabled ? 'border-primary bg-primary/10 text-primary' : ''}`} onClick={() => setTempChatEnabled(!tempChatEnabled)}><Sparkles className="mr-1 h-4 w-4" />مؤقتة</Button>
             <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-full" onClick={handleAttachClick}><Paperclip className="h-4 w-4" /></Button>
             <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-full" onClick={toggleRecording}><Mic className="h-4 w-4" /></Button>
-            <Select value={selectedModel} onValueChange={setSelectedModel}><SelectTrigger className="h-9 w-[150px] shrink-0 rounded-full bg-muted/40 px-3 text-xs"><SelectValue placeholder="النموذج" /></SelectTrigger><SelectContent>{modelsToShow.map((m: any) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}</SelectContent></Select>
             <Button type="button" variant="outline" size="sm" className="h-9 shrink-0 rounded-full px-3 text-xs" onClick={() => setShowActions((v) => !v)}><Brain className="mr-1 h-4 w-4" />تفكير</Button>
+            <Button type="button" variant="outline" size="sm" className="h-9 shrink-0 rounded-full px-3 text-xs" onClick={() => setShowSettings(true)}><Menu className="mr-1 h-4 w-4" />إعدادات</Button>
           </div>
           <div className="rounded-[1.5rem] border border-input bg-card shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
             <Textarea ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={enterToSend ? 'اكتب رسالتك...' : 'اكتب رسالتك... (Ctrl/Cmd+Enter للإرسال)'} className="min-h-[112px] w-full resize-none border-0 bg-transparent px-4 py-4 text-[15px] leading-6 focus-visible:ring-0" dir="auto" />
-            <div className="flex items-center justify-between gap-2 px-3 pb-3"><div className="flex items-center gap-2"><Button type="button" variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={handleAttachClick}><Paperclip className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={toggleRecording}><Mic className="h-4 w-4" /></Button></div><Button type="button" onClick={handleSend} disabled={sendMessage.isPending || !input.trim()} className="h-11 w-11 rounded-full p-0"><Send className="h-4 w-4" /></Button></div>
+            <div className="flex items-center justify-between gap-2 px-3 pb-3"><div className="flex items-center gap-2"><Button type="button" variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={handleAttachClick}><Paperclip className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={toggleRecording}><Mic className="h-4 w-4" /></Button><Button type="button" variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={handleDeleteConversation}><Trash2 className="h-4 w-4" /></Button></div><Button type="button" onClick={handleSend} disabled={sendMessage.isPending || !input.trim()} className="h-11 w-11 rounded-full p-0"><Send className="h-4 w-4" /></Button></div>
           </div>
           {showActions && <div className="rounded-2xl border border-border bg-card p-3 text-sm md:hidden"><DropdownMenu open onOpenChange={setShowActions}><DropdownMenuTrigger asChild><button className="hidden" /></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem onClick={() => { setShowActions(false); toast.message('استخدم زر تفكير في الشريط السفلي'); }}><Brain className="mr-2 h-4 w-4" />التفكير العميق</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { handleAttachClick(); setShowActions(false); }}><Paperclip className="mr-2 h-4 w-4" />مرفقات</DropdownMenuItem><DropdownMenuItem onClick={() => { handleDeleteConversation(); setShowActions(false); }} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" />حذف المحادثة</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div>}
           {attachedFiles.length > 0 && <div className="flex flex-wrap gap-2">{attachedFiles.map((f, i) => <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs"><span className="max-w-[140px] truncate">{f.name}</span><button type="button" onClick={() => removeAttachedFile(i)} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button></div>)}</div>}
-          <input ref={fileInputRef} type="file" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) setAttachedFiles((s) => [...s, file]); }} />
+          <input ref={fileInputRef} type="file" className="hidden" multiple onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) setAttachedFiles((s) => [...s, ...files]); }} />
         </div>
       </div>
     </main>
+  {showSettings && <div className="fixed inset-0 z-50 bg-black/40 p-3 sm:p-6"><div className="mx-auto h-full max-w-5xl overflow-hidden rounded-3xl bg-background shadow-2xl"><SettingsPage onClose={() => setShowSettings(false)} /></div></div>}
   </div>
 }

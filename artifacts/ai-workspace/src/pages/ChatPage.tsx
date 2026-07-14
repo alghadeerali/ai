@@ -271,12 +271,12 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background relative">
-      <header className="flex-none h-14 border-b border-border bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60 flex items-center justify-between px-4 sticky top-0 z-20">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+    <div className="flex flex-col h-full bg-background relative overflow-x-hidden">
+      <header className="flex-none h-14 border-b border-border bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60 flex items-center justify-between px-3 sm:px-4 sticky top-0 z-20 overflow-x-hidden">
+        <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
           <div className="md:hidden w-8" />
           <div className="flex flex-col min-w-0">
-            <div className="text-xs text-muted-foreground leading-none">{tempChatEnabled && !id ? "محادثة مؤقتة" : ""}</div>
+            <div className="text-xs text-muted-foreground leading-none truncate">{tempChatEnabled ? "مؤقتة" : ""}</div>
             <div className="flex items-center gap-2 min-w-0">
               {isEditingTitle && id ? (
                 <input type="text" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} onBlur={handleSaveTitle} onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()} className="bg-background border border-input rounded px-2 py-1 text-sm font-medium w-full max-w-[16rem] focus:outline-none focus:ring-1 focus:ring-ring" autoFocus />
@@ -289,7 +289,7 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap justify-end">
+        <div className="hidden md:flex items-center gap-2 flex-wrap justify-end">
           <Select value={selectedModel} onValueChange={handleModelChange}>
             <SelectTrigger className="w-[140px] sm:w-[200px] h-9 rounded-full bg-muted/40 border-border/70 shadow-none text-xs sm:text-sm px-3">
               <div className="flex items-center gap-2 truncate">
@@ -388,44 +388,31 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               placeholder={enterToSend ? "اكتب رسالتك..." : "اكتب رسالتك... (Ctrl/Cmd+Enter للإرسال)"}
-              className="block w-full min-h-[68px] max-h-[220px] resize-none border-0 focus-visible:ring-0 text-[15px] px-4 py-4 pr-32 sm:pr-40 pl-24 sm:pl-28 bg-transparent leading-6 break-words whitespace-pre-wrap"
+              className="block w-full min-h-[74px] max-h-[220px] resize-none border-0 focus-visible:ring-0 text-[15px] px-4 py-4 pr-4 pl-4 bg-transparent leading-6 break-words whitespace-pre-wrap"
               dir="auto"
             />
-            <div className="absolute left-3 bottom-3 flex items-center gap-1 z-10 shrink-0">
-              <DropdownMenu open={showComposerActions} onOpenChange={setShowComposerActions}>
-                <DropdownMenuTrigger asChild>
-                  <Button type="button" variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground bg-muted/30" aria-label="المزيد">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-56 rounded-2xl p-2">
-                  <DropdownMenuItem onClick={() => toast.info(tempChatEnabled ? "المحادثة المؤقتة مفعلة" : "المحادثة المؤقتة غير مفعلة") }>
-                    <Sparkles className="mr-2 h-4 w-4" /> المحادثة المؤقتة
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setThinking((v) => !v)}>
-                    <Brain className="mr-2 h-4 w-4" /> التفكير العميق {thinking ? "✓" : ""}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info(`نموذج الصور: ${imageModels.length || 0}`)}>
-                    <ImageIcon className="mr-2 h-4 w-4" /> إنشاء صورة
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleAttachClick}>
-                    <Paperclip className="mr-2 h-4 w-4" /> المرفقات
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button type="button" size="icon" variant="ghost" onClick={toggleRecording} title="إدخال صوتي" className={`h-9 w-9 rounded-full ${isRecording ? "text-red-500 animate-pulse" : "text-muted-foreground"}`}>
-                <Mic className="h-4 w-4" />
-              </Button>
-              <Button size="icon" onClick={handleSend} disabled={!input.trim() || sendMessage.isPending} className="h-9 w-9 rounded-full shadow-sm">
-                <Send className="h-4 w-4 ml-0.5" />
+            <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2 pointer-events-none">
+              <div className="flex items-center gap-2 pointer-events-auto">
+                <DropdownMenu open={showComposerActions} onOpenChange={setShowComposerActions}>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground bg-muted/30" aria-label="المزيد">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" side="top" className="w-56">
+                    <DropdownMenuItem onClick={handleAttachClick}><Paperclip className="mr-2 h-4 w-4" />مرفقات</DropdownMenuItem>
+                    <DropdownMenuItem onClick={toggleRecording}><Mic className="mr-2 h-4 w-4" />إدخال صوتي</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setShowComposerActions(false)}>إغلاق</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button type="button" variant="outline" className={`h-9 rounded-full px-3 text-xs sm:text-sm ${tempChatEnabled ? 'bg-black text-white border-black dark:bg-primary dark:text-primary-foreground dark:border-primary' : 'bg-background text-foreground'}`} onClick={() => setTempChatEnabled(!tempChatEnabled)} aria-pressed={tempChatEnabled} aria-label="المحادثة المؤقتة">
+                  <Sparkles className="h-4 w-4 mr-1" />
+                  مؤقتة
+                </Button>
+              </div>
+              <Button type="button" onClick={handleSend} disabled={sendMessage.isPending || !input.trim()} className="h-11 w-11 rounded-full p-0 shrink-0 shadow-none">
+                <Send className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-          <div className="max-w-4xl mx-auto text-center mt-2">
-            <p className="text-[10px] text-muted-foreground/60">قد يرتكب المساعد أخطاء. تحقّق من المعلومات المهمة.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+          </div>}

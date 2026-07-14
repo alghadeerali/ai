@@ -415,4 +415,4 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-          </div>}
+          </div>

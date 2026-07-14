@@ -49,13 +49,5 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
 export function Sidebar() {
   const [open, setOpen] = useState(false);
-  return <>
-    <div className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-background px-3 md:hidden">
-      <Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="ghost" size="icon" className="h-10 w-10"><Menu className="h-5 w-5" /></Button></SheetTrigger><SheetContent side="left" className="w-[86vw] max-w-[330px] p-0"><SidebarContent onClose={() => setOpen(false)} /></SheetContent></Sheet>
-      <div className="min-w-0 flex-1 text-center"><div className="truncate text-base font-bold tracking-tight text-primary">AI Workspace</div></div>
-      <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setOpen(true)} aria-label="فتح القائمة"><Plus className="h-5 w-5" /></Button>
-    </div>
-    <aside className="hidden md:flex md:h-[100dvh] md:w-[292px] md:flex-col md:border-r md:border-border md:bg-sidebar"><SidebarContent /></aside>
-    <SearchDialog open={false} onOpenChange={() => {}} />
-  </>
+  return <aside className="hidden md:flex md:h-[100dvh] md:w-[292px] md:flex-col md:border-r md:border-border md:bg-sidebar"><SidebarContent /></aside>;
 }

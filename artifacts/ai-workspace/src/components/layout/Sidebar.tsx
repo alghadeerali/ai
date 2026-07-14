@@ -180,7 +180,7 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Sidebar */}
-      <div className="md:hidden flex items-center p-4 border-b bg-background">
+      <div className="md:hidden flex items-center p-4 border-b bg-background overflow-x-hidden max-w-[100vw]">
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="mr-2">
@@ -195,7 +195,7 @@ export function Sidebar() {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex w-64 border-r border-sidebar-border bg-sidebar h-[100dvh] flex-col shrink-0">
+      <div className="hidden md:flex w-64 border-r border-sidebar-border bg-sidebar h-[100dvh] flex-col shrink-0 overflow-x-hidden">
         <NavContent />
       </div>
 

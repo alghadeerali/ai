@@ -226,16 +226,10 @@ export default function ChatPage() {
 
   const handleExportMarkdown = () => {
     if (!messages?.length) { toast.error("لا توجد رسائل للتصدير"); return; }
-    const md = messages.map((m) => `## ${m.role === "user" ? "أنت" : "المساعد"}
-
-${m.content}`).join("
-
----
-
-");
-    const blob = new Blob([`# ${conversation?.title ?? "محادثة"}
-
-${md}`], { type: "text/markdown;charset=utf-8" });
+const md = messages
+      .map((m) => `## ${m.role === "user" ? "أنت" : "المساعد"}\n\n${m.content}`)
+      .join("\n\n---\n\n");
+const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = `${conversation?.title ?? "conversation"}.md`; a.click(); URL.revokeObjectURL(url);

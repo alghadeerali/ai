@@ -5,14 +5,11 @@ type Direction = "auto" | "ltr" | "rtl";
 interface SettingsContextType {
   direction: Direction;
   setDirection: (dir: Direction) => void;
-  /** When true, Enter sends the message and Shift+Enter inserts a new line. */
   enterToSend: boolean;
   setEnterToSend: (v: boolean) => void;
-  /** Model ids the user pinned to show in the chat model picker. Empty = show all. */
   favoriteModels: string[];
   setFavoriteModels: (ids: string[]) => void;
   toggleFavoriteModel: (id: string) => void;
-  /** Model used for brand-new conversations. */
   defaultModel: string;
   setDefaultModel: (id: string) => void;
   tempChatEnabled: boolean;
@@ -47,9 +44,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [tempChatEnabled, setTempChatEnabled] = useState<boolean>(
     () => readJSON<boolean>("app-temp-chat", false),
   );
-  const [tempChatEnabled, setTempChatEnabled] = useState<boolean>(
-    () => readJSON<boolean>("app-temp-chat", false),
-  );
 
   useEffect(() => {
     localStorage.setItem("app-direction", direction);
@@ -71,10 +65,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem("app-default-model", defaultModel);
   }, [defaultModel]);
-
-  useEffect(() => {
-    localStorage.setItem("app-temp-chat", JSON.stringify(tempChatEnabled));
-  }, [tempChatEnabled]);
 
   useEffect(() => {
     localStorage.setItem("app-temp-chat", JSON.stringify(tempChatEnabled));

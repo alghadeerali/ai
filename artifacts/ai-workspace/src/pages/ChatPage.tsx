@@ -57,15 +57,15 @@ export default function ChatPage() {
         <div className="min-w-0 flex-1 px-2 text-center"><div className="truncate text-base font-bold tracking-tight">{id ? (conversation?.title || 'محادثة جديدة') : 'محادثة جديدة'}</div><div className="truncate text-[11px] text-muted-foreground">{tempChatEnabled ? 'مؤقتة' : ''}</div></div>
         <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setShowActions((v) => !v)}><Plus className="h-5 w-5" /></Button>
       </div>
-      {showDrawer && <div className="fixed inset-0 z-40 md:hidden"><button className="absolute inset-0 bg-black/35" onClick={() => setShowDrawer(false)} /><div className="absolute inset-y-0 left-0 w-[86vw] max-w-[330px] bg-sidebar shadow-2xl"><Sidebar /></div></div>}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 sm:px-4 sm:py-6" dir={direction === 'rtl' ? 'rtl' : 'ltr'}>
+      {showDrawer && <div className="fixed inset-0 z-40 md:hidden"><button className="absolute inset-0 bg-black/35" onClick={() => setShowDrawer(false)} /><div className="absolute inset-y-0 left-0 w-[86vw] max-w-[330px] bg-sidebar shadow-2xl overflow-hidden"><Sidebar /></div></div>}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-0 py-0 sm:px-4 sm:py-6" dir={direction === 'rtl' ? 'rtl' : 'ltr'}>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 pb-4">
           {!messages?.length && !sendMessage.isPending && <div className="flex flex-col items-center justify-center py-14 text-center"><div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary"><Sparkles className="h-8 w-8" /></div><h1 className="mb-2 text-2xl font-bold tracking-tight">كيف أقدر أساعدك اليوم؟</h1><p className="max-w-sm text-sm leading-relaxed text-muted-foreground">اكتب رسالتك بالأسفل. تقدر تبدّل النموذج أو تستخدم المحادثة المؤقتة من الشريط السفلي.</p></div>}
           {loadingConv || loadingMessages ? <div className="space-y-4"><Skeleton className="h-20 w-3/4 ml-auto" /><Skeleton className="h-24 w-3/4" /><Skeleton className="h-20 w-2/3 ml-auto" /></div> : messages?.map((msg: any) => { const isUser = msg.role === 'user'; return <div key={msg.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`} dir="auto"><div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${isUser ? 'bg-primary/20 text-primary' : 'border border-border bg-secondary text-secondary-foreground'}`}>{isUser ? <UserSquare className="h-5 w-5" /> : <Bot className="h-5 w-5" />}</div><div className={`flex min-w-0 flex-col gap-1 ${isUser ? 'items-end' : 'items-start'} max-w-[88%]`}><div className="rounded-2xl border border-border bg-card px-4 py-3 text-[15px] leading-relaxed">{!isUser && msg.reasoning && <ReasoningBlock reasoning={msg.reasoning} />}<ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown></div></div></div> })}
         </div>
       </div>
-      <div className="border-t border-border bg-background px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-2">
+      <div className="border-t border-border bg-background px-0 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-3">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-3 sm:px-0">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             <Button type="button" variant="outline" size="sm" className={`h-9 shrink-0 rounded-full px-3 text-xs ${tempChatEnabled ? 'border-primary bg-primary/10 text-primary' : ''}`} onClick={() => setTempChatEnabled(!tempChatEnabled)}><Sparkles className="mr-1 h-4 w-4" />مؤقتة</Button>
             <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-full" onClick={handleAttachClick}><Paperclip className="h-4 w-4" /></Button>

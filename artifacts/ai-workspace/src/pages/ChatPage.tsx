@@ -480,6 +480,13 @@ export default function ChatPage() {
             </div>
           )}
 
+          {tempChatEnabled && !id && (
+            <div className="hidden sm:flex items-center gap-2 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+              <Sparkles className="h-3.5 w-3.5" />
+              مؤقتة
+            </div>
+          )}
+
           {id && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

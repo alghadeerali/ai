@@ -18,12 +18,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   const createConv = useCreateConversation();
   const updateConv = useUpdateConversation();
   const go = (href: string) => { setLocation(href); onClose?.(); };
-  const newConversation = () => createConv.mutate({ data: { title: "New Conversation", model: "openai/gpt-4o" } }, { onSuccess: (c) => go(`/c/${c.id}`) });
+  const newConversation = () => createConv.mutate({ data: { title: "محادثة جديدة", model: "openai/gpt-4o" } }, { onSuccess: (c) => go(`/c/${c.id}`) });
   const del = (id: number) => updateConv.mutate({ id, data: { deleted: true } as any }, { onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() }); toast.success("تم حذف المحادثة"); if (location === `/c/${id}`) go("/"); } });
   const item = (href: string, label: string, icon: any) => <button type="button" onClick={() => go(href)} className={`flex h-11 w-full items-center gap-3 rounded-2xl px-3 text-sm font-medium ${location === href || (href !== '/' && location.startsWith(href)) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60'}`}>{icon}{label}</button>;
   return <div className="flex h-full min-h-0 flex-col bg-sidebar text-sidebar-foreground">
     <div className="flex items-center justify-between border-b border-sidebar-border p-4">
-      <div className="min-w-0"><div className="truncate text-lg font-bold tracking-tight text-sidebar-primary">AI Workspace</div><div className="text-[11px] text-sidebar-foreground/60">Projects • Chats</div></div>
+      <div className="min-w-0"><div className="truncate text-lg font-bold tracking-tight text-sidebar-primary">alghadeer ai</div><div className="text-[11px] text-sidebar-foreground/60">Projects • Chats</div></div>
       {onClose && <Button variant="ghost" size="icon" className="h-9 w-9 md:hidden" onClick={onClose} aria-label="إغلاق"><X className="h-5 w-5" /></Button>}
     </div>
     <div className="p-3"><Button className="h-11 w-full justify-start gap-2 rounded-2xl" onClick={newConversation}><Plus className="h-4 w-4" /> محادثة جديدة</Button></div>

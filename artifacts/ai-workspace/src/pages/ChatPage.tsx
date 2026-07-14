@@ -271,153 +271,75 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background relative overflow-x-hidden">
-      <header className="flex-none h-14 border-b border-border bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60 flex items-center justify-between px-3 sm:px-4 sticky top-0 z-20 overflow-x-hidden">
-        <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
-          <div className="md:hidden w-8" />
-          <div className="flex flex-col min-w-0">
-            <div className="text-xs text-muted-foreground leading-none truncate">{tempChatEnabled ? "مؤقتة" : ""}</div>
-            <div className="flex items-center gap-2 min-w-0">
-              {isEditingTitle && id ? (
-                <input type="text" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} onBlur={handleSaveTitle} onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()} className="bg-background border border-input rounded px-2 py-1 text-sm font-medium w-full max-w-[16rem] focus:outline-none focus:ring-1 focus:ring-ring" autoFocus />
-              ) : (
-                <button type="button" onClick={() => !id ? null : setIsEditingTitle(true)} className="text-left min-w-0 truncate font-semibold text-foreground hover:text-primary transition-colors">
-                  {id ? (conversation?.title || "محادثة جديدة") : "محادثة جديدة"}
-                </button>
-              )}
-            </div>
+    <div className="flex h-full min-h-[100dvh] flex-col bg-background overflow-hidden">
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/95 px-3 backdrop-blur">
+        <div className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden">
+          <div className="md:hidden w-8 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-foreground">{id ? (conversation?.title || "محادثة جديدة") : "محادثة جديدة"}</div>
+            <div className="truncate text-[11px] text-muted-foreground">{tempChatEnabled ? "مؤقتة" : ""}</div>
           </div>
         </div>
-
-        <div className="hidden md:flex items-center gap-2 flex-wrap justify-end">
-          <Select value={selectedModel} onValueChange={handleModelChange}>
-            <SelectTrigger className="w-[140px] sm:w-[200px] h-9 rounded-full bg-muted/40 border-border/70 shadow-none text-xs sm:text-sm px-3">
-              <div className="flex items-center gap-2 truncate">
-                <Cpu className="h-3.5 w-3.5 text-primary" />
-                <span className="truncate">{models?.find(m => m.id === selectedModel)?.name || selectedModel}</span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {visibleModels.map(m => (<SelectItem key={m.id} value={m.id}><div className="flex items-center justify-between w-full gap-4"><span>{m.name}</span>{m.isFree && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">Free</span>}</div></SelectItem>))}
-            </SelectContent>
-          </Select>
-
-          {personas && personas.length > 0 && (
-            <Select value={selectedPersonaId?.toString() || "none"} onValueChange={handlePersonaChange}>
-              <SelectTrigger className="hidden sm:flex w-[140px] h-9 rounded-full bg-muted/40 border-border/70 shadow-none text-xs sm:text-sm px-3">
-                <div className="flex items-center gap-2 truncate">
-                  <UserSquare className="h-3.5 w-3.5" />
-                  <span className="truncate">{selectedPersonaId ? personas.find(p => p.id === selectedPersonaId)?.name : "الشخصية الافتراضية"}</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Default Persona</SelectItem>
-                {personas.map(p => (<SelectItem key={p.id} value={p.id.toString()}>{p.emoji && <span className="mr-2">{p.emoji}</span>}{p.name}</SelectItem>))}
-              </SelectContent>
-            </Select>
-          )}
-
-          <Button type="button" variant="outline" className={`h-9 rounded-full px-3 text-xs sm:text-sm border-border ${tempChatEnabled ? 'bg-black text-white border-black dark:bg-primary dark:text-primary-foreground dark:border-primary' : 'bg-background text-foreground'}`} onClick={() => setTempChatEnabled(!tempChatEnabled)} aria-pressed={tempChatEnabled} aria-label="المحادثة المؤقتة">
-            <Sparkles className="h-4 w-4 mr-1" />
-            مؤقتة
-          </Button>
-
-          {id && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setIsEditingTitle(true)}><Edit2 className="mr-2 h-4 w-4" /> إعادة تسمية</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportMarkdown}><Download className="mr-2 h-4 w-4" /> تصدير Markdown</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onClick={() => { archiveConv.mutate({ id, data: { archived: true } }, { onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() }); toast.success("تمت الأرشفة"); setLocation("/"); }, }); }}><Archive className="mr-2 h-4 w-4" /> أرشفة</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
+        <div className="hidden md:flex items-center gap-2 shrink-0">{/* desktop controls kept in current UI */}</div>
       </header>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth" dir={direction === "rtl" ? "rtl" : "ltr"}>
-        <div className="max-w-4xl mx-auto space-y-6 pb-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 scroll-smooth" dir={direction === "rtl" ? "rtl" : "ltr"}>
+        <div className="mx-auto max-w-3xl space-y-6 pb-4">
           {!messages?.length && !sendMessage.isPending && (
-            <div className="flex flex-col items-center justify-center text-center py-16">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary shadow-sm border border-primary/20"><Sparkles className="h-8 w-8" /></div>
-              <h1 className="text-2xl font-bold tracking-tight mb-2">كيف أقدر أساعدك اليوم؟</h1>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-md leading-relaxed">اكتب رسالتك بالأسفل للبدء. تقدر تبدّل النموذج والشخصية من الأعلى في أي وقت.</p>
+            <div className="flex flex-col items-center justify-center py-14 text-center">
+              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-sm"><Sparkles className="h-8 w-8" /></div>
+              <h1 className="mb-2 text-2xl font-bold tracking-tight">كيف أقدر أساعدك اليوم؟</h1>
+              <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">اكتب رسالتك بالأسفل. تقدر تبدّل النموذج أو تفعّل المحادثة المؤقتة من زرها في الأسفل.</p>
             </div>
           )}
           {messages?.map((msg) => {
             const isUser = msg.role === "user";
             return (
-              <div key={msg.id} className={`flex gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`} dir="auto">
-                <div className={`w-8 h-8 rounded-md flex-shrink-0 flex items-center justify-center ${isUser ? 'bg-primary/20 text-primary' : 'bg-secondary text-secondary-foreground border border-border'}`}>{isUser ? <UserSquare className="h-5 w-5" /> : <Bot className="h-5 w-5" />}</div>
-                <div className={`flex flex-col gap-1 max-w-[85%] min-w-0 ${isUser ? 'items-end' : 'items-start'}`}>
+              <div key={msg.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`} dir="auto">
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${isUser ? 'bg-primary/20 text-primary' : 'border border-border bg-secondary text-secondary-foreground'}`}>{isUser ? <UserSquare className="h-5 w-5" /> : <Bot className="h-5 w-5" />}</div>
+                <div className={`flex min-w-0 flex-col gap-1 ${isUser ? 'items-end' : 'items-start'} max-w-[88%]`}>
                   {!isUser && msg.reasoning && <ReasoningBlock reasoning={msg.reasoning} />}
-                  <div className={`px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${isUser ? 'bg-primary text-primary-foreground rounded-tr-sm' : 'bg-card border border-border rounded-tl-sm'}`}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code: CodeBlock }} className={`prose prose-sm max-w-none ${isUser ? 'prose-invert' : 'dark:prose-invert'} prose-p:leading-relaxed prose-pre:p-0 prose-pre:bg-transparent prose-pre:m-0`}>{msg.content}</ReactMarkdown>
+                  <div className={`prose prose-sm max-w-none break-words rounded-2xl px-4 py-3 ${isUser ? 'bg-primary text-primary-foreground' : 'bg-card border border-border text-foreground'}`}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+                      code({ inline, className, children, ...props }: any) {
+                        const match = /language-(\w+)/.exec(className || '');
+                        const [copied, setCopied] = useState(false);
+                        const normalized = String(children).endsWith('
+') ? String(children).slice(0, -1) : String(children);
+                        const onCopy = () => { navigator.clipboard.writeText(normalized); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+                        if (!inline && match) return (<div className="my-3 overflow-hidden rounded-xl border border-border"><div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground"><span>{match[1]}</span><Button variant="ghost" size="icon" className="h-6 w-6" onClick={onCopy}>{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}</Button></div><SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" customStyle={{ margin: 0, borderRadius: 0, background: 'transparent' }} {...props}>{normalized}</SyntaxHighlighter></div>);
+                        return <code className="rounded-md bg-muted px-1.5 py-0.5 text-sm font-mono" {...props}>{children}</code>;
+                      }
+                    }}>
+                      {msg.content}
+                    </ReactMarkdown>
                   </div>
-                  {!isUser && (<div className="flex items-center gap-3 px-1 text-[11px] text-muted-foreground/70 font-medium"><span>{models?.find(m => m.id === msg.model)?.name || msg.model}</span>{msg.costUsd !== null && msg.costUsd !== undefined && (<span>${msg.costUsd.toFixed(5)}</span>)}</div>)}
                 </div>
               </div>
             );
           })}
-          {sendMessage.isPending && (<div className="flex gap-4 flex-row" dir="auto"><div className="w-8 h-8 rounded-md flex-shrink-0 flex items-center justify-center bg-secondary text-secondary-foreground border border-border"><Bot className="h-5 w-5" /></div><div className="bg-card border border-border rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm"><div className="flex gap-1.5 items-center h-5"><div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" /><div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" /><div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" /></div></div></div>)}
         </div>
       </div>
 
-      <div className="flex-none p-4 bg-background/90 backdrop-blur border-t border-border">
-        <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFilesSelected} />
-        <div className="max-w-4xl mx-auto space-y-3">
-          {attachedFiles.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {attachedFiles.map((f, i) => (
-                <div key={`${f.name}-${i}`} className="flex items-center gap-2 bg-muted/50 border border-border rounded-full px-3 py-1.5 text-xs">
-                  <span className="truncate max-w-[140px]">{f.name}</span>
-                  <button type="button" onClick={() => removeAttachedFile(i)} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className="relative w-full rounded-[1.6rem] border border-input bg-card shadow-[0_10px_30px_rgba(0,0,0,0.06)] focus-within:ring-1 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all overflow-hidden max-w-full">
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={handleInput}
-              onKeyDown={handleKeyDown}
-              placeholder={enterToSend ? "اكتب رسالتك..." : "اكتب رسالتك... (Ctrl/Cmd+Enter للإرسال)"}
-              className="block w-full min-h-[74px] max-h-[220px] resize-none border-0 focus-visible:ring-0 text-[15px] px-4 py-4 pr-4 pl-4 bg-transparent leading-6 break-words whitespace-pre-wrap"
-              dir="auto"
-            />
-            <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2 pointer-events-none">
-              <div className="flex items-center gap-2 pointer-events-auto">
-                <DropdownMenu open={showComposerActions} onOpenChange={setShowComposerActions}>
-                  <DropdownMenuTrigger asChild>
-                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground bg-muted/30" aria-label="المزيد">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" side="top" className="w-56">
-                    <DropdownMenuItem onClick={handleAttachClick}><Paperclip className="mr-2 h-4 w-4" />مرفقات</DropdownMenuItem>
-                    <DropdownMenuItem onClick={toggleRecording}><Mic className="mr-2 h-4 w-4" />إدخال صوتي</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setShowComposerActions(false)}>إغلاق</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button type="button" variant="outline" className={`h-9 rounded-full px-3 text-xs sm:text-sm ${tempChatEnabled ? 'bg-black text-white border-black dark:bg-primary dark:text-primary-foreground dark:border-primary' : 'bg-background text-foreground'}`} onClick={() => setTempChatEnabled(!tempChatEnabled)} aria-pressed={tempChatEnabled} aria-label="المحادثة المؤقتة">
-                  <Sparkles className="h-4 w-4 mr-1" />
-                  مؤقتة
-                </Button>
-              </div>
-              <Button type="button" onClick={handleSend} disabled={sendMessage.isPending || !input.trim()} className="h-11 w-11 rounded-full p-0 shrink-0 shadow-none">
-                <Send className="h-4 w-4" />
-              </Button>
+      <div className="border-t border-border bg-background px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="mx-auto max-w-3xl space-y-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <Button type="button" variant="outline" size="sm" className={`h-9 rounded-full px-3 text-xs ${tempChatEnabled ? 'border-primary bg-primary/10 text-primary' : 'bg-background'}`} onClick={() => setTempChatEnabled(!tempChatEnabled)} aria-pressed={tempChatEnabled} aria-label="المحادثة المؤقتة"><Sparkles className="mr-1 h-4 w-4" />مؤقتة</Button>
+            <Button type="button" variant="outline" size="icon" className="h-9 w-9 rounded-full" onClick={handleAttachClick} aria-label="المرفقات"><Paperclip className="h-4 w-4" /></Button>
+            <Button type="button" variant="outline" size="icon" className="h-9 w-9 rounded-full" onClick={toggleRecording} aria-label="إدخال صوتي"><Mic className="h-4 w-4" /></Button>
+            <div className="flex-1" />
+            <Select value={selectedModel} onValueChange={handleModelChange}><SelectTrigger className="h-9 w-[150px] rounded-full bg-muted/40 px-3 text-xs"><SelectValue placeholder="النموذج" /></SelectTrigger><SelectContent>{visibleModels.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}</SelectContent></Select>
+          </div>
+          <div className="relative rounded-[1.5rem] border border-input bg-card shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+            <Textarea ref={textareaRef} value={input} onChange={handleInput} onKeyDown={handleKeyDown} placeholder={enterToSend ? 'اكتب رسالتك...' : 'اكتب رسالتك... (Ctrl/Cmd+Enter للإرسال)'} className="min-h-[110px] w-full resize-none border-0 bg-transparent px-4 py-4 text-[15px] leading-6 focus-visible:ring-0" dir="auto" />
+            <div className="flex items-center justify-between gap-2 px-3 pb-3">
+              <div className="flex gap-2" />
+              <Button type="button" onClick={handleSend} disabled={sendMessage.isPending || !input.trim()} className="h-11 w-11 rounded-full p-0"><Send className="h-4 w-4" /></Button>
             </div>
           </div>
+          {attachedFiles.length > 0 && <div className="flex flex-wrap gap-2">{attachedFiles.map((f, i) => <div key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs"><span className="max-w-[140px] truncate">{f.name}</span><button type="button" onClick={() => removeAttachedFile(i)} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button></div>)}</div>}
         </div>
       </div>
     </div>
   );
-}
+}}

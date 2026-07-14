@@ -40,15 +40,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     if (direction === "auto") document.documentElement.removeAttribute("dir");
     else document.documentElement.dir = direction;
   }, [direction]);
-
   useEffect(() => { localStorage.setItem("app-enter-to-send", JSON.stringify(enterToSend)); }, [enterToSend]);
   useEffect(() => { localStorage.setItem("app-favorite-models", JSON.stringify(favoriteModels)); }, [favoriteModels]);
   useEffect(() => { localStorage.setItem("app-default-model", defaultModel); }, [defaultModel]);
   useEffect(() => { localStorage.setItem("app-temp-chat", JSON.stringify(tempChatEnabled)); }, [tempChatEnabled]);
 
-  const toggleFavoriteModel = (id: string) => {
-    setFavoriteModels((prev) => prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]);
-  };
+  const toggleFavoriteModel = (id: string) => setFavoriteModels((prev) => prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]);
 
   return (
     <SettingsContext.Provider value={{ direction, setDirection, enterToSend, setEnterToSend, favoriteModels, setFavoriteModels, toggleFavoriteModel, defaultModel, setDefaultModel, tempChatEnabled, setTempChatEnabled, openRouterKeyConfigured: true }}>

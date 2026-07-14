@@ -32,9 +32,7 @@ import {
   Paperclip,
   X,
   Plus,
-  Image as ImageIcon,
-  MessageSquareText,
-  WandSparkles
+  Image as ImageIcon
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -49,8 +47,7 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuSeparator, 
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
   Select,
@@ -408,12 +405,12 @@ $/, '')}</SyntaxHighlighter></div>);
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="top" className="w-56 rounded-2xl p-2">
-                  <DropdownMenuCheckboxItem checked={tempChatEnabled} onCheckedChange={() => toast.info('فعّل/أوقف المحادثة المؤقتة من الإعدادات')}>
+                  <DropdownMenuItem onClick={() => toast.info(tempChatEnabled ? "المحادثة المؤقتة مفعلة" : "المحادثة المؤقتة غير مفعلة") }>
                     <Sparkles className="mr-2 h-4 w-4" /> المحادثة المؤقتة
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem checked={thinking} onCheckedChange={() => setThinking((v) => !v)}>
-                    <Brain className="mr-2 h-4 w-4" /> التفكير العميق
-                  </DropdownMenuCheckboxItem>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setThinking((v) => !v)}>
+                    <Brain className="mr-2 h-4 w-4" /> التفكير العميق {thinking ? "✓" : ""}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => toast.info(`نموذج الصور: ${imageModels.length || 0}`)}>
                     <ImageIcon className="mr-2 h-4 w-4" /> إنشاء صورة
                   </DropdownMenuItem>

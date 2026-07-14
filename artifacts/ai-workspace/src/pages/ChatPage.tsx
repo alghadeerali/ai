@@ -40,8 +40,7 @@ export default function ChatPage() {
   const updateConv = useUpdateConversation();
   const createConv = useCreateConversation();
   const archiveConv = useArchiveConversation();
-  const visibleModels = models ?? [];
-  useEffect(() => { if (conversation) { setEditedTitle(conversation.title); setSelectedModel(conversation.model); } }, [conversation]);
+    useEffect(() => { if (conversation) { setEditedTitle(conversation.title); setSelectedModel(conversation.model); } }, [conversation]);
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [messages?.length]);
   const handleSaveTitle = () => { if (!id || !editedTitle.trim()) return; updateConv.mutate({ id, data: { title: editedTitle.trim() } }, { onSuccess: () => {} }); };
   const handleSend = async () => { if (!input.trim() || sendMessage.isPending) return; const content = input; setInput(""); if (!id) { try { const conv = await createConv.mutateAsync({ data: { title: content.slice(0, 40), model: selectedModel } }); queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() }); setLocation(`/c/${conv.id}`); sendMessage.mutate({ id: conv.id, data: { content } as any }); } catch { setInput(content); toast.error("تعذّر إنشاء المحادثة"); } return; } sendMessage.mutate({ id, data: { content } as any }); };
@@ -50,7 +49,6 @@ export default function ChatPage() {
   const removeAttachedFile = (i: number) => setAttachedFiles((f) => f.filter((_, idx) => idx !== i));
   const toggleRecording = () => toast.message("إدخال صوتي سيُضاف لاحقًا");
   const handleDeleteConversation = () => { if (!id) return; updateConv.mutate({ id, data: { deleted: true } as any }, { onSuccess: () => { toast.success("تم حذف المحادثة"); queryClient.invalidateQueries({ queryKey: getListConversationsQueryKey() }); setLocation('/'); } }); };
-  const modelsToShow = visibleModels;
   return <div className="flex min-h-[100dvh] w-full overflow-hidden bg-background text-foreground">
     <Sidebar />
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden">

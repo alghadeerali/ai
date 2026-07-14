@@ -304,7 +304,7 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
 
           {personas && personas.length > 0 && (
             <Select value={selectedPersonaId?.toString() || "none"} onValueChange={handlePersonaChange}>
-              <SelectTrigger className="w-[140px] h-9 rounded-full bg-muted/40 border-border/70 shadow-none text-xs sm:text-sm px-3">
+              <SelectTrigger className="hidden sm:flex w-[140px] h-9 rounded-full bg-muted/40 border-border/70 shadow-none text-xs sm:text-sm px-3">
                 <div className="flex items-center gap-2 truncate">
                   <UserSquare className="h-3.5 w-3.5" />
                   <span className="truncate">{selectedPersonaId ? personas.find(p => p.id === selectedPersonaId)?.name : "الشخصية الافتراضية"}</span>
@@ -317,8 +317,9 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
             </Select>
           )}
 
-          <Button type="button" variant="ghost" size="icon" className={`h-9 w-9 rounded-full ${tempChatEnabled ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`} onClick={() => toast.info(tempChatEnabled ? 'المحادثة المؤقتة مفعلة من الإعدادات' : 'فعّل المحادثة المؤقتة من الإعدادات')} aria-label="المحادثة المؤقتة">
-            <Sparkles className="h-4 w-4" />
+          <Button type="button" variant="outline" className={`h-9 rounded-full px-3 text-xs sm:text-sm ${tempChatEnabled ? 'border-primary/30 bg-primary/10 text-primary' : 'text-muted-foreground'}`} onClick={() => toast.info(tempChatEnabled ? 'المحادثة المؤقتة مفعلة من الإعدادات' : 'فعّل المحادثة المؤقتة من الإعدادات')} aria-label="المحادثة المؤقتة">
+            <Sparkles className="h-4 w-4 mr-1" />
+            مؤقتة
           </Button>
 
           {id && (
@@ -380,17 +381,17 @@ const blob = new Blob([`# ${conversation?.title ?? "محادثة"}\n\n${md}`], {
               ))}
             </div>
           )}
-          <div className="relative rounded-[1.6rem] border border-input bg-card shadow-[0_10px_30px_rgba(0,0,0,0.06)] focus-within:ring-1 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all overflow-hidden">
+          <div className="relative rounded-[1.6rem] border border-input bg-card shadow-[0_10px_30px_rgba(0,0,0,0.06)] focus-within:ring-1 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all overflow-hidden max-w-full">
             <Textarea
               ref={textareaRef}
               value={input}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               placeholder={enterToSend ? "اكتب رسالتك..." : "اكتب رسالتك... (Ctrl/Cmd+Enter للإرسال)"}
-              className="min-h-[68px] max-h-[240px] resize-none border-0 focus-visible:ring-0 text-[15px] px-4 py-5 pr-40 bg-transparent leading-6"
+              className="min-h-[68px] max-h-[220px] resize-none border-0 focus-visible:ring-0 text-[15px] px-4 py-4 pr-32 sm:pr-40 bg-transparent leading-6"
               dir="auto"
             />
-            <div className="absolute left-3 bottom-3 flex items-center gap-1">
+            <div className="absolute left-3 bottom-3 flex items-center gap-1 z-10">
               <DropdownMenu open={showComposerActions} onOpenChange={setShowComposerActions}>
                 <DropdownMenuTrigger asChild>
                   <Button type="button" variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground bg-muted/30" aria-label="المزيد">

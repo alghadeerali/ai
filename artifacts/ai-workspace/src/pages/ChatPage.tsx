@@ -28,7 +28,9 @@ import {
   Mic,
   Sparkles,
   Brain,
-  ChevronDown
+  ChevronDown,
+  Paperclip,
+  X
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -97,6 +99,8 @@ export default function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
   // Queries
   const { data: conversation, isLoading: loadingConv } = useGetConversation(id!, { 
@@ -232,6 +236,24 @@ export default function ChatPage() {
       e.preventDefault();
       handleSend();
     }
+  };
+
+
+  const handleAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length) {
+      setAttachedFiles((prev) => [...prev, ...files]);
+      toast.success(`تمت إضافة ${files.length} ملف`);
+    }
+    e.target.value = "";
+  };
+
+  const removeAttachedFile = (index: number) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const toggleRecording = () => {
@@ -568,7 +590,34 @@ export default function ChatPage() {
 
       {/* Composer */}
       <div className="flex-none p-4 bg-background/80 backdrop-blur border-t border-border">
-        <div className="max-w-4xl mx-auto relative rounded-xl border border-input bg-card shadow-sm focus-within:ring-1 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all overflow-hidden">
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={handleFilesSelected}
+        />
+        <div className="max-w-4xl mx-auto space-y-2">
+          {attachedFiles.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {attachedFiles.map((f, i) => (
+                <div
+                  key={`${f.name}-${i}`}
+                  className="flex items-center gap-2 bg-muted/50 border border-border rounded-lg px-2.5 py-1.5 text-xs"
+                >
+                  <span className="truncate max-w-[140px]">{f.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachedFile(i)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        <div className="relative rounded-xl border border-input bg-card shadow-sm focus-within:ring-1 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all overflow-hidden">
           <Textarea
             ref={textareaRef}
             value={input}
@@ -583,6 +632,16 @@ export default function ChatPage() {
             dir="auto"
           />
           <div className="absolute right-3 bottom-3 flex items-center gap-1">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={handleAttachClick}
+              title="إرفاق ملف"
+              className="h-8 w-8 rounded-lg text-muted-foreground"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
             <Button
               type="button"
               size="icon"
@@ -612,6 +671,7 @@ export default function ChatPage() {
               <Send className="h-4 w-4 ml-0.5" />
             </Button>
           </div>
+        </div>
         </div>
         <div className="max-w-4xl mx-auto text-center mt-2">
           <p className="text-[10px] text-muted-foreground/60">

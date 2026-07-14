@@ -5,9 +5,9 @@ import { SettingsProvider } from "@/providers/SettingsProvider";
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
     <SettingsProvider>
-      <div className="flex min-h-[100dvh] max-w-[100vw] bg-background text-foreground overflow-hidden">
+      <div className="flex min-h-[100dvh] w-full overflow-hidden bg-background text-foreground">
         <Sidebar />
-        <main className="flex-1 flex flex-col min-w-0 max-w-full overflow-hidden relative">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {children}
         </main>
       </div>

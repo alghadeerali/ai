@@ -65,26 +65,26 @@ export default function SettingsPage() {
   const imageModels = useMemo(() => (models ?? []).filter(isImageModel), [models]);
 
   return (
-    <div className="flex-1 px-3 py-4 sm:p-8 bg-background overflow-y-auto overflow-x-hidden">
-      <div className="max-w-3xl mx-auto space-y-5 w-full">
-        <div>
+    <div className="flex-1 px-3 py-3 sm:p-8 bg-background overflow-y-auto overflow-x-hidden">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5 w-full">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground flex items-center gap-3 leading-tight">
-            <Settings className="h-8 w-8 text-primary" />
+            <Settings className="h-7 w-7 text-primary" />
             Settings
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1 leading-relaxed">Manage app preferences and configurations.</p>
         </div>
 
-        <div className="grid gap-5">
+        <div className="grid gap-4 sm:gap-5">
           <Card className="bg-card border-border shadow-sm rounded-2xl">
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-3 sm:pb-4">
               <CardTitle className="text-base sm:text-lg">Appearance</CardTitle>
-              <CardDescription className="text-sm leading-relaxed">Customize how AI Workspace looks on your device.</CardDescription>
+              <CardDescription className="text-sm leading-relaxed">Customize how the app looks on phone and desktop.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Theme</Label>
-                <RadioGroup value={theme || "light"} onValueChange={setTheme} className="grid grid-cols-3 gap-3 sm:gap-4">
+                <RadioGroup value={theme || "light"} onValueChange={setTheme} className="grid grid-cols-3 gap-2 sm:gap-4">
                   <Label htmlFor="theme-light" className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer text-sm sm:text-base">
                     <RadioGroupItem value="light" id="theme-light" className="sr-only" />
                     <Sun className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
@@ -107,8 +107,8 @@ export default function SettingsPage() {
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Text Direction</Label>
-                <CardDescription className="text-sm leading-relaxed">Force the chat interface to Left-to-Right or Right-to-Left (useful for Arabic).</CardDescription>
-                <RadioGroup defaultValue={direction} onValueChange={(val: any) => setDirection(val)} className="grid grid-cols-3 gap-3 sm:gap-4">
+                <CardDescription className="text-sm leading-relaxed">Force the interface to LTR or RTL when needed.</CardDescription>
+                <RadioGroup value={direction} onValueChange={(val: any) => setDirection(val)} className="grid grid-cols-3 gap-2 sm:gap-4">
                   <Label htmlFor="dir-auto" className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer text-sm sm:text-base">
                     <RadioGroupItem value="auto" id="dir-auto" className="sr-only" />
                     <Monitor className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
@@ -130,25 +130,25 @@ export default function SettingsPage() {
           </Card>
 
           <Card className="bg-card border-border shadow-sm rounded-2xl">
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-3 sm:pb-4">
               <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-primary" /> المحادثة
               </CardTitle>
-              <CardDescription className="text-sm leading-relaxed">تحكّم في سلوك الإرسال والنماذج.</CardDescription>
+              <CardDescription className="text-sm leading-relaxed">Controls for sending, temporary chat, and model behavior.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-4 sm:space-y-5">
               <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/20 px-4 py-3">
                 <div className="space-y-1 min-w-0">
                   <Label className="text-sm font-medium">زر Enter يرسل الرسالة</Label>
-                  <p className="text-xs leading-relaxed text-muted-foreground">عند التفعيل: Enter يرسل و Shift+Enter سطر جديد. عند الإيقاف: Enter سطر جديد و Ctrl/Cmd+Enter يرسل.</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">Enter للإرسال و Shift+Enter لسطر جديد.</p>
                 </div>
                 <Switch checked={enterToSend} onCheckedChange={setEnterToSend} />
               </div>
 
-              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-primary/5 px-4 py-3">
+              <div className="flex items-center justify-between gap-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
                 <div className="space-y-1 min-w-0">
                   <Label className="text-sm font-medium">المحادثة المؤقتة</Label>
-                  <p className="text-xs leading-relaxed text-muted-foreground">ابدأ محادثة بدون حفظها في القائمة الجانبية.</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">تظهر في composer وتبقى محفوظة كخيار على الجهاز.</p>
                 </div>
                 <Switch checked={tempChatEnabled} onCheckedChange={setTempChatEnabled} />
               </div>
@@ -159,10 +159,10 @@ export default function SettingsPage() {
                 <Label className="text-sm font-medium flex items-center gap-2">
                   <ImageIcon className="h-4 w-4" /> إنشاء صورة
                 </Label>
-                <CardDescription className="text-sm leading-relaxed">اطّلع على النماذج القادرة على توليد الصور مع الكلفة التقديرية لكل واحد.</CardDescription>
+                <CardDescription className="text-sm leading-relaxed">عرض النماذج القادرة على توليد الصور مع الكلفة التقديرية.</CardDescription>
                 <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full max-w-sm justify-start gap-2 text-sm">
+                    <Button variant="outline" className="w-full max-w-sm justify-start gap-2 text-sm border-border">
                       <ImageIcon className="h-4 w-4" /> إنشاء صورة
                     </Button>
                   </DialogTrigger>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
                     </DialogHeader>
                     <ScrollArea className="h-80">
                       <div className="space-y-1 pr-2">
-                        {imageModels.length === 0 && <p className="text-sm text-muted-foreground p-4 text-center">لا توجد نماذج متاحة حالياً لتوليد الصور.</p>}
+                        {imageModels.length === 0 && <p className="text-sm text-muted-foreground p-4 text-center">لا توجد نماذج متاحة حالياً.</p>}
                         {imageModels.map((m) => (
                           <div key={m.id} className="flex items-center justify-between gap-3 rounded-md px-3 py-2 hover:bg-muted/50 text-sm">
                             <span className="text-sm flex-1 truncate">{m.name}</span>
@@ -188,7 +188,7 @@ export default function SettingsPage() {
               <Separator className="bg-border" />
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium flex items-center gap-2"><Cpu className="h-4 w-4" /> النموذج الافتراضي للمحادثات الجديدة</Label>
+                <Label className="text-sm font-medium flex items-center gap-2"><Cpu className="h-4 w-4" /> النموذج الافتراضي</Label>
                 <Select value={defaultModel} onValueChange={setDefaultModel}>
                   <SelectTrigger className="w-full max-w-sm">
                     <SelectValue placeholder="اختر نموذجاً" />
@@ -203,7 +203,8 @@ export default function SettingsPage() {
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium flex items-center gap-2"><Star className="h-4 w-4" /> النماذج المفضّلة</Label>
-                <CardDescription className="text-sm leading-relaxed">أول 15 نموذجاً تظهر تلقائياً بالأعلى. اضغط على العلامة (✓) لتثبيت نموذج فيرتفع لأعلى القائمة، واضغط على النجمة لجعله النموذج الافتراضي للمحادثات الجديدة.</CardDescription>
+                <CardDescription className="text-sm leading-relaxed">أول 15 نموذجاً تظهر تلقائياً بالأعلى. فعل tick لرفع النموذج للأعلى، والنجمة تجعل النموذج افتراضي.
+                </CardDescription>
                 <div className="relative w-full max-w-sm">
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input value={modelSearch} onChange={(e) => setModelSearch(e.target.value)} placeholder="ابحث عن نموذج..." className="pr-9 text-sm" />
@@ -214,7 +215,7 @@ export default function SettingsPage() {
                       <div key={m.id} className="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/50 text-sm">
                         <Checkbox id={`fav-${m.id}`} checked={favoriteModels.includes(m.id)} onCheckedChange={() => toggleFavoriteModel(m.id)} />
                         <label htmlFor={`fav-${m.id}`} className="text-sm flex-1 truncate cursor-pointer">{m.name}</label>
-                        {m.isFree && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">Free</span>}
+                        {m.isFree && <span className="text-[10px] bg-black text-white px-1.5 py-0.5 rounded font-medium">Free</span>}
                         <button type="button" onClick={() => setDefaultModel(m.id)} title="اجعله النموذج الافتراضي" className="p-1 rounded hover:bg-muted transition-colors">
                           <Star className={`h-4 w-4 ${defaultModel === m.id ? "fill-primary text-primary" : "text-muted-foreground"}`} />
                         </button>

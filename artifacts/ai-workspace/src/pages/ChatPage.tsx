@@ -56,7 +56,7 @@ export default function ChatPage() {
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <div className="md:hidden sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background px-3">
         <MobileSidebarTrigger onOpen={() => setShowDrawer(true)} />
-        <div className="min-w-0 flex-1 px-2 text-center"><div className="truncate text-base font-bold tracking-tight">{id ? (conversation?.title || 'محادثة جديدة') : 'محادثة جديدة'}</div><div className="truncate text-[11px] text-muted-foreground">{tempChatEnabled ? 'مؤقتة' : ''}</div></div>
+        <div className="min-w-0 flex-1 px-2 text-center"><div className="truncate text-base font-bold tracking-tight">{id ? (conversation?.title || 'محادثة جديدة') : 'محادثة جديدة'}</div><div className="truncate text-[11px] text-muted-foreground">{'}</div></div>
         <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setShowSettings(true)} aria-label="الإعدادات"><Menu className="h-5 w-5" /></Button>
       </div>
       <MobileSidebar open={showDrawer} onOpenChange={setShowDrawer} />

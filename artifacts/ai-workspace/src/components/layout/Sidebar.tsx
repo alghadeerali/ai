@@ -180,14 +180,14 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Sidebar */}
-      <div className="md:hidden flex items-center p-4 border-b bg-background overflow-x-hidden max-w-[100vw]">
+      <div className="md:hidden flex items-center p-3 border-b bg-background overflow-x-hidden max-w-[100vw]">
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="mr-2">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-[280px] border-sidebar-border">
+          <SheetContent side="left" className="p-0 w-[82vw] max-w-[300px] border-sidebar-border">
             <NavContent />
           </SheetContent>
         </Sheet>

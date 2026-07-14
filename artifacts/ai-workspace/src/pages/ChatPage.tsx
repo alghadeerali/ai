@@ -81,6 +81,9 @@ function ReasoningBlock({ reasoning }: { reasoning: string }) {
   );
 }
 
+function SidebarDesktop() { return <></>; }
+function SidebarMobile({ onClose }: { onClose: () => void }) { return <></>; }
+
 export default function ChatPage() {
   const [match, params] = useRoute("/c/:id");
   const [, setLocation] = useLocation();
@@ -96,6 +99,7 @@ export default function ChatPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [showComposerActions, setShowComposerActions] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);

@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSettings } from "@/providers/SettingsProvider";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { Sidebar, MobileSidebar, MobileSidebarTrigger } from "@/components/layout/Sidebar";
 
 function ReasoningBlock({ reasoning }: { reasoning: string }) { const [open, setOpen] = useState(false); return <div className="w-full overflow-hidden rounded-2xl border border-border bg-muted/30"><button type="button" onClick={() => setOpen(v => !v)} className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-muted-foreground"><Brain className="h-3.5 w-3.5 text-primary" />التفكير <ChevronDown className={`ml-auto h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} /></button>{open && <div className="border-t border-border/50 px-3 py-2 text-[13px] leading-relaxed text-muted-foreground whitespace-pre-wrap">{reasoning}</div>}</div> }
 
@@ -53,11 +53,11 @@ export default function ChatPage() {
     <Sidebar />
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <div className="md:hidden sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background px-3">
-        <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setShowDrawer(true)}><Menu className="h-5 w-5" /></Button>
+        <MobileSidebarTrigger onOpen={() => setShowDrawer(true)} />
         <div className="min-w-0 flex-1 px-2 text-center"><div className="truncate text-base font-bold tracking-tight">{id ? (conversation?.title || 'محادثة جديدة') : 'محادثة جديدة'}</div><div className="truncate text-[11px] text-muted-foreground">{tempChatEnabled ? 'مؤقتة' : ''}</div></div>
         <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setShowActions((v) => !v)}><Plus className="h-5 w-5" /></Button>
       </div>
-      {showDrawer && <div className="fixed inset-0 z-40 md:hidden"><button className="absolute inset-0 bg-black/35" onClick={() => setShowDrawer(false)} /><div className="absolute inset-y-0 left-0 w-[86vw] max-w-[330px] bg-sidebar shadow-2xl overflow-hidden"><div className="h-full"><div className="md:hidden flex h-14 items-center justify-between border-b border-sidebar-border px-4"><div className="font-bold text-sidebar-primary">AI Workspace</div><button className="text-xl" onClick={() => setShowDrawer(false)}>×</button></div><div className="h-[calc(100%-3.5rem)] overflow-hidden"><Sidebar /></div></div></div></div>}
+      <MobileSidebar open={showDrawer} onOpenChange={setShowDrawer} />
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-0 py-0 sm:px-4 sm:py-6" dir={direction === 'rtl' ? 'rtl' : 'ltr'}>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 pb-4">
           {!messages?.length && !sendMessage.isPending && <div className="flex flex-col items-center justify-center py-14 text-center"><div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary"><Sparkles className="h-8 w-8" /></div><h1 className="mb-2 text-2xl font-bold tracking-tight">كيف أقدر أساعدك اليوم؟</h1><p className="max-w-sm text-sm leading-relaxed text-muted-foreground">اكتب رسالتك بالأسفل. تقدر تبدّل النموذج أو تستخدم المحادثة المؤقتة من الشريط السفلي.</p></div>}

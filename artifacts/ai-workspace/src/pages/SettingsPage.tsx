@@ -111,7 +111,7 @@ export default function SettingsPage() {
         <div className="grid gap-6">
           <Card className="bg-card border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg">Appearance</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Appearance</CardTitle>
               <CardDescription>Customize how AI Workspace looks on your device.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -121,30 +121,30 @@ export default function SettingsPage() {
                 <RadioGroup 
                   value={theme || "light"} 
                   onValueChange={setTheme}
-                  className="grid grid-cols-3 gap-4"
+                  className="grid grid-cols-3 gap-3 sm:gap-4"
                 >
                   <Label
                     htmlFor="theme-light"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
                   >
                     <RadioGroupItem value="light" id="theme-light" className="sr-only" />
-                    <Sun className="mb-3 h-6 w-6" />
+                    <Sun className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
                     Light
                   </Label>
                   <Label
                     htmlFor="theme-dark"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
                   >
                     <RadioGroupItem value="dark" id="theme-dark" className="sr-only" />
-                    <Moon className="mb-3 h-6 w-6" />
+                    <Moon className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
                     Dark
                   </Label>
                   <Label
                     htmlFor="theme-system"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
                   >
                     <RadioGroupItem value="system" id="theme-system" className="sr-only" />
-                    <Monitor className="mb-3 h-6 w-6" />
+                    <Monitor className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
                     System
                   </Label>
                 </RadioGroup>
@@ -160,30 +160,30 @@ export default function SettingsPage() {
                 <RadioGroup 
                   defaultValue={direction} 
                   onValueChange={(val: any) => setDirection(val)}
-                  className="grid grid-cols-3 gap-4"
+                  className="grid grid-cols-3 gap-3 sm:gap-4"
                 >
                   <Label
                     htmlFor="dir-auto"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
                   >
                     <RadioGroupItem value="auto" id="dir-auto" className="sr-only" />
-                    <Monitor className="mb-3 h-6 w-6" />
+                    <Monitor className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
                     Auto Detect
                   </Label>
                   <Label
                     htmlFor="dir-ltr"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
                   >
                     <RadioGroupItem value="ltr" id="dir-ltr" className="sr-only" />
-                    <AlignLeft className="mb-3 h-6 w-6" />
+                    <AlignLeft className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
                     LTR
                   </Label>
                   <Label
                     htmlFor="dir-rtl"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
+                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 sm:p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5 cursor-pointer"
                   >
                     <RadioGroupItem value="rtl" id="dir-rtl" className="sr-only" />
-                    <AlignRight className="mb-3 h-6 w-6" />
+                    <AlignRight className="mb-2 h-5 w-5 sm:mb-3 sm:h-6 sm:w-6" />
                     RTL
                   </Label>
                 </RadioGroup>
@@ -202,7 +202,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
                   <Label className="text-sm font-medium">زر Enter يرسل الرسالة</Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs leading-relaxed text-muted-foreground">
                     عند التفعيل: Enter يرسل و Shift+Enter سطر جديد. عند الإيقاف: Enter سطر جديد و Ctrl/Cmd+Enter يرسل.
                   </p>
                 </div>
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                 </CardDescription>
                 <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full max-w-sm justify-start gap-2">
+                    <Button variant="outline" className="w-full max-w-sm justify-start gap-2 text-sm">
                       <ImageIcon className="h-4 w-4" />
                       إنشاء صورة
                     </Button>
@@ -291,10 +291,10 @@ export default function SettingsPage() {
                     value={modelSearch}
                     onChange={(e) => setModelSearch(e.target.value)}
                     placeholder="ابحث عن نموذج..."
-                    className="pr-9"
+                    className="pr-9 text-sm"
                   />
                 </div>
-                <ScrollArea className="h-64 rounded-md border border-border p-2">
+                <ScrollArea className="h-56 rounded-md border border-border p-2">
                   <div className="space-y-1">
                     {displayedModels?.map((m) => (
                       <div
@@ -341,7 +341,7 @@ export default function SettingsPage() {
                   </div>
                 </ScrollArea>
                 {favoriteModels.length > 0 && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs leading-relaxed text-muted-foreground">
                     مختار {favoriteModels.length} نموذج.
                   </p>
                 )}
@@ -351,7 +351,7 @@ export default function SettingsPage() {
 
           <Card className="bg-card border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg">Integrations</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Integrations</CardTitle>
               <CardDescription>API Keys and external services.</CardDescription>
             </CardHeader>
             <CardContent>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useListConversations, useCreateConversation, useUpdateConversation } from "@workspace/api-client-react";
-import { Menu, Plus, Search, MessageSquare, Archive, Settings, Activity, Users, MoreHorizontal, Trash2, X } from "lucide-react";
+import { Menu, Plus, Search, MessageSquare, Archive, Settings, Activity, MoreHorizontal, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,41 +10,33 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchDialog } from "./SearchDialog";
 import { toast } from "sonner";
 
-function SidebarContent({ onNavigate, onClose }: { onNavigate?: () => void; onClose?: () => void }) {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const [location, setLocation] = useLocation();
   const { data: conversations, isLoading } = useListConversations({ archived: false, deleted: false });
   const createConv = useCreateConversation();
   const updateConv = useUpdateConversation();
-
-  const go = (href: string) => { setLocation(href); onNavigate?.(); onClose?.(); };
+  const go = (href: string) => { setLocation(href); onClose?.(); };
   const newConversation = () => createConv.mutate({ data: { title: "New Conversation", model: "openai/gpt-4o" } }, { onSuccess: (c) => go(`/c/${c.id}`) });
   const del = (id: number) => updateConv.mutate({ id, data: { deleted: true } as any }, { onSuccess: () => { toast.success("تم حذف المحادثة"); if (location === `/c/${id}`) go("/"); } });
-
+  const item = (href: string, label: string, icon: any) => <button type="button" onClick={() => go(href)} className={`flex h-11 w-full items-center gap-3 rounded-2xl px-3 text-sm font-medium ${location === href || (href !== '/' && location.startsWith(href)) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60'}`}>{icon}{label}</button>;
   return <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
     <div className="flex items-center justify-between border-b border-sidebar-border p-4">
-      <div>
-        <div className="text-lg font-bold tracking-tight text-sidebar-primary">AI Workspace</div>
-        <div className="text-[11px] text-sidebar-foreground/60">Projects • Chats</div>
-      </div>
+      <div className="min-w-0"><div className="truncate text-lg font-bold tracking-tight text-sidebar-primary">AI Workspace</div><div className="text-[11px] text-sidebar-foreground/60">Projects • Chats</div></div>
       {onClose && <Button variant="ghost" size="icon" className="h-9 w-9 md:hidden" onClick={onClose} aria-label="إغلاق"><X className="h-5 w-5" /></Button>}
     </div>
-    <div className="p-3">
-      <Button className="h-11 w-full justify-start gap-2 rounded-2xl" onClick={newConversation}><Plus className="h-4 w-4" /> محادثة جديدة</Button>
-    </div>
-    <div className="px-3 pb-3">
-      <Button variant="outline" className="h-11 w-full justify-start rounded-2xl bg-sidebar-accent/40 border-sidebar-border text-sidebar-foreground/80" onClick={() => go("/search")}><Search className="mr-2 h-4 w-4" /> بحث</Button>
-    </div>
+    <div className="p-3"><Button className="h-11 w-full justify-start gap-2 rounded-2xl" onClick={newConversation}><Plus className="h-4 w-4" /> محادثة جديدة</Button></div>
+    <div className="px-3 pb-3"><Button variant="outline" className="h-11 w-full justify-start rounded-2xl bg-sidebar-accent/40 border-sidebar-border text-sidebar-foreground/80" onClick={() => go("/search")}><Search className="mr-2 h-4 w-4" /> بحث</Button></div>
     <ScrollArea className="flex-1 px-3">
       <div className="space-y-1 pb-3">
-        <NavItem active={location === "/"} onClick={() => go("/")} icon={<MessageSquare className="h-4 w-4" />}>المحادثات</NavItem>
-        <NavItem active={location.startsWith("/archive")} onClick={() => go("/archive")} icon={<Archive className="h-4 w-4" />}>الأرشيف</NavItem>
-        <NavItem active={location.startsWith("/usage")} onClick={() => go("/usage")} icon={<Activity className="h-4 w-4" />}>الاستخدام</NavItem>
-        <NavItem active={location.startsWith("/settings")} onClick={() => go("/settings")} icon={<Settings className="h-4 w-4" />}>الإعدادات</NavItem>
+        {item('/', 'المحادثات', <MessageSquare className="h-4 w-4" />)}
+        {item('/archive', 'الأرشيف', <Archive className="h-4 w-4" />)}
+        {item('/usage', 'الاستخدام', <Activity className="h-4 w-4" />)}
+        {item('/settings', 'الإعدادات', <Settings className="h-4 w-4" />)}
       </div>
       <div className="mt-5 space-y-2">
         <div className="px-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">Recent</div>
         {isLoading ? <div className="space-y-2 px-2"><Skeleton className="h-9 w-full bg-sidebar-accent/40" /><Skeleton className="h-9 w-full bg-sidebar-accent/40" /><Skeleton className="h-9 w-full bg-sidebar-accent/40" /></div> : conversations?.map((c) => <div key={c.id} className={`group flex items-center gap-2 rounded-2xl px-3 py-2 text-sm ${location === `/c/${c.id}` ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60'}`}>
-          <Link href={`/c/${c.id}`} className="min-w-0 flex-1 truncate" onClick={onNavigate}>{c.title}</Link>
+          <Link href={`/c/${c.id}`} className="min-w-0 flex-1 truncate" onClick={onClose}>{c.title}</Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44"><DropdownMenuItem className="text-destructive" onClick={() => del(c.id)}><Trash2 className="mr-2 h-4 w-4" /> حذف المحادثة</DropdownMenuItem></DropdownMenuContent>
@@ -55,17 +47,15 @@ function SidebarContent({ onNavigate, onClose }: { onNavigate?: () => void; onCl
   </div>
 }
 
-function NavItem({ active, onClick, icon, children }: any) { return <button type="button" onClick={onClick} className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium ${active ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/60'}`}>{icon}{children}</button> }
-
 export function Sidebar() {
   const [open, setOpen] = useState(false);
-  const [, setLocation] = useLocation();
   return <>
     <div className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-background px-3 md:hidden">
-      <Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="ghost" size="icon" className="h-10 w-10"><Menu className="h-5 w-5" /></Button></SheetTrigger><SheetContent side="left" className="w-[86vw] max-w-[330px] p-0"><SidebarContent onClose={() => setOpen(false)} onNavigate={() => setOpen(false)} /></SheetContent></Sheet>
+      <Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="ghost" size="icon" className="h-10 w-10"><Menu className="h-5 w-5" /></Button></SheetTrigger><SheetContent side="left" className="w-[86vw] max-w-[330px] p-0"><SidebarContent onClose={() => setOpen(false)} /></SheetContent></Sheet>
       <div className="min-w-0 flex-1 text-center"><div className="truncate text-base font-bold tracking-tight text-primary">AI Workspace</div></div>
-      <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setLocation('/settings')} aria-label="الإعدادات"><Settings className="h-5 w-5" /></Button>
+      <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setOpen(true)} aria-label="فتح القائمة"><Plus className="h-5 w-5" /></Button>
     </div>
     <aside className="hidden md:flex md:h-[100dvh] md:w-[292px] md:flex-col md:border-r md:border-border md:bg-sidebar"><SidebarContent /></aside>
+    <SearchDialog open={false} onOpenChange={() => {}} />
   </>
 }

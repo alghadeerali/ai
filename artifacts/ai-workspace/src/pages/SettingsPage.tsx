@@ -1,7 +1,8 @@
+import { useState, useMemo } from "react";
 import { useSettings } from "@/providers/SettingsProvider";
 import { useTheme } from "next-themes";
 import { useListModels } from "@workspace/api-client-react";
-import { Settings, Moon, Sun, Monitor, AlignLeft, AlignRight, Key, MessageSquare, Cpu, Star } from "lucide-react";
+import { Settings, Moon, Sun, Monitor, AlignLeft, AlignRight, Key, MessageSquare, Cpu, Star, Search, Image as ImageIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -9,6 +10,15 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -16,6 +26,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+// A model is treated as "image-capable" if its id/name/description hints at image generation.
+function isImageModel(m: any): boolean {
+  const text = `${m.id} ${m.name} ${m.description ?? ""}`.toLowerCase();
+  return (
+    text.includes("image") ||
+    text.includes("vision") ||
+    text.includes("dall-e") ||
+    text.includes("dalle") ||
+    text.includes("flux") ||
+    text.includes("stable-diffusion") ||
+    text.includes("midjourney") ||
+    text.includes("gemini-2") ||
+    text.includes("imagen")
+  );
+}
+
+function estimateImageCost(m: any): string {
+  // Rough estimate based on completion pricing per 1K tokens, scaled as a stand-in
+  // for a single generated image (actual OpenRouter image pricing varies by model).
+  const p = Number(m.pricingCompletion ?? m.pricingPrompt ?? 0);
+  if (!p || Number.isNaN(p)) return "غير متوفر";
+  const estimate = p * 1000; // rough scaling heuristic
+  if (estimate <= 0) return "مجاني";
+  return `~$${estimate.toFixed(4)}`;
+}
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -31,10 +67,39 @@ export default function SettingsPage() {
     setDefaultModel,
   } = useSettings();
   const { data: models } = useListModels();
+  const [modelSearch, setModelSearch] = useState("");
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+
+  // Sort: favorites always first (most-recently-favorited on top), rest keep original order.
+  const sortedModels = useMemo(() => {
+    if (!models) return [];
+    const favSet = new Set(favoriteModels);
+    const favs = favoriteModels
+      .map((id) => models.find((m) => m.id === id))
+      .filter(Boolean) as typeof models;
+    const rest = models.filter((m) => !favSet.has(m.id));
+    return [...favs, ...rest];
+  }, [models, favoriteModels]);
+
+  const filteredModels = useMemo(() => {
+    const q = modelSearch.trim().toLowerCase();
+    if (!q) return sortedModels;
+    return sortedModels.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) || m.id.toLowerCase().includes(q),
+    );
+  }, [sortedModels, modelSearch]);
+
+  const displayedModels = modelSearch ? filteredModels : filteredModels.slice(0, 15);
+
+  const imageModels = useMemo(() => {
+    if (!models) return [];
+    return models.filter(isImageModel);
+  }, [models]);
 
   return (
-    <div className="flex-1 p-8 bg-background overflow-y-auto">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <div className="flex-1 p-4 sm:p-8 bg-background overflow-y-auto overflow-x-hidden">
+      <div className="max-w-3xl mx-auto space-y-8 w-full">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
             <Settings className="h-8 w-8 text-primary" />
@@ -50,7 +115,7 @@ export default function SettingsPage() {
               <CardDescription>Customize how AI Workspace looks on your device.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              
+
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Theme</Label>
                 <RadioGroup 
@@ -148,6 +213,52 @@ export default function SettingsPage() {
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" /> إنشاء صورة
+                </Label>
+                <CardDescription>
+                  اطّلع على النماذج القادرة على توليد الصور مع الكلفة التقديرية لكل واحد.
+                </CardDescription>
+                <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full max-w-sm justify-start gap-2">
+                      <ImageIcon className="h-4 w-4" />
+                      إنشاء صورة
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <ImageIcon className="h-5 w-5" /> نماذج توليد الصور
+                      </DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="h-80">
+                      <div className="space-y-1 pr-2">
+                        {imageModels.length === 0 && (
+                          <p className="text-sm text-muted-foreground p-4 text-center">
+                            لا توجد نماذج متاحة حالياً لتوليد الصور.
+                          </p>
+                        )}
+                        {imageModels.map((m) => (
+                          <div
+                            key={m.id}
+                            className="flex items-center justify-between gap-3 rounded-md px-3 py-2 hover:bg-muted/50"
+                          >
+                            <span className="text-sm flex-1 truncate">{m.name}</span>
+                            <span className="text-xs text-muted-foreground font-mono whitespace-nowrap">
+                              {estimateImageCost(m)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="space-y-3">
+                <Label className="text-sm font-medium flex items-center gap-2">
                   <Cpu className="h-4 w-4" /> النموذج الافتراضي للمحادثات الجديدة
                 </Label>
                 <Select value={defaultModel} onValueChange={setDefaultModel}>
@@ -171,29 +282,62 @@ export default function SettingsPage() {
                   <Star className="h-4 w-4" /> النماذج المفضّلة
                 </Label>
                 <CardDescription>
-                  اختر النماذج التي تظهر في قائمة المحادثة. إذا لم تختر أياً منها، ستظهر جميع النماذج.
+                  أول 15 نموذجاً تظهر تلقائياً بالأعلى. اضغط على العلامة (✓) لتثبيت نموذج فيرتفع لأعلى القائمة،
+                  واضغط على النجمة لجعله النموذج الافتراضي للمحادثات الجديدة.
                 </CardDescription>
+                <div className="relative max-w-sm">
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={modelSearch}
+                    onChange={(e) => setModelSearch(e.target.value)}
+                    placeholder="ابحث عن نموذج..."
+                    className="pr-9"
+                  />
+                </div>
                 <ScrollArea className="h-64 rounded-md border border-border p-2">
                   <div className="space-y-1">
-                    {models?.map((m) => (
-                      <label
+                    {displayedModels?.map((m) => (
+                      <div
                         key={m.id}
-                        htmlFor={`fav-${m.id}`}
-                        className="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/50 cursor-pointer"
+                        className="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/50"
                       >
                         <Checkbox
                           id={`fav-${m.id}`}
                           checked={favoriteModels.includes(m.id)}
                           onCheckedChange={() => toggleFavoriteModel(m.id)}
                         />
-                        <span className="text-sm flex-1 truncate">{m.name}</span>
+                        <label
+                          htmlFor={`fav-${m.id}`}
+                          className="text-sm flex-1 truncate cursor-pointer"
+                        >
+                          {m.name}
+                        </label>
                         {m.isFree && (
                           <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
                             Free
                           </span>
                         )}
-                      </label>
+                        <button
+                          type="button"
+                          onClick={() => setDefaultModel(m.id)}
+                          title="اجعله النموذج الافتراضي"
+                          className="p-1 rounded hover:bg-muted transition-colors"
+                        >
+                          <Star
+                            className={`h-4 w-4 ${
+                              defaultModel === m.id
+                                ? "fill-primary text-primary"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        </button>
+                      </div>
                     ))}
+                    {displayedModels?.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-6">
+                        لا توجد نتائج مطابقة.
+                      </p>
+                    )}
                   </div>
                 </ScrollArea>
                 {favoriteModels.length > 0 && (
@@ -237,6 +381,7 @@ export default function SettingsPage() {
               </div>
               <p className="text-xs text-muted-foreground mt-4">
                 API keys are managed securely on the backend via environment variables. Contact your administrator to update them.
+                يتم حفظ هذه المفاتيح كمتغيرات بيئة (Environment Variables) على منصة Render، وليست في قاعدة البيانات أو المتصفح.
               </p>
             </CardContent>
           </Card>

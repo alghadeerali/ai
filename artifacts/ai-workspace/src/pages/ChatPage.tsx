@@ -87,7 +87,7 @@ export default function ChatPage() {
   const [, setLocation] = useLocation();
   const id = match && params?.id ? parseInt(params.id, 10) : null;
   const queryClient = useQueryClient();
-  const { direction, enterToSend, favoriteModels, defaultModel } = useSettings();
+  const { direction, enterToSend, favoriteModels, defaultModel, tempChatEnabled } = useSettings();
 
   const [input, setInput] = useState("");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -424,7 +424,7 @@ export default function ChatPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           {models && (
             <Select value={selectedModel} onValueChange={handleModelChange}>
               <SelectTrigger className="w-[180px] h-8 text-xs bg-muted/30 border-none shadow-none">
@@ -471,6 +471,13 @@ export default function ChatPage() {
                 ))}
               </SelectContent>
             </Select>
+          )}
+
+          {tempChatEnabled && !id && (
+            <div className="hidden sm:flex items-center gap-2 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+              <Sparkles className="h-3.5 w-3.5" />
+              مؤقتة
+            </div>
           )}
 
           {id && (
@@ -524,7 +531,7 @@ export default function ChatPage() {
                 <Sparkles className="h-8 w-8" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight mb-2">كيف أقدر أساعدك اليوم؟</h1>
-              <p className="text-muted-foreground max-w-md">
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md leading-relaxed">
                 اكتب رسالتك بالأسفل للبدء. تقدر تبدّل النموذج والشخصية من الأعلى في أي وقت.
               </p>
             </div>
